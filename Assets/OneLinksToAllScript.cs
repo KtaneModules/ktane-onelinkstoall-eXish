@@ -6,68 +6,6 @@ using System.Text.RegularExpressions;
 using System;
 using UnityEngine.UI;
 
-// Data for article queries
-[Serializable]
-public class jsonData
-{
-    public queryResult query;
-}
-
-[Serializable]
-public class queryResult
-{
-    public List<randomData> random;
-}
-
-[Serializable]
-public class randomData
-{
-    public string title;
-}
-
-// Data for link queries
-[Serializable]
-public class jsonData2
-{
-    public queryResult2 query;
-}
-
-[Serializable]
-public class queryResult2
-{
-    public pageData pages;
-}
-
-[Serializable]
-public class pageData
-{
-    public pageID id;
-}
-
-[Serializable]
-public class pageID
-{
-    public List<linkData> linkshere;
-}
-
-[Serializable]
-public class linkData
-{
-    public string title;
-}
-
-[Serializable]
-public class jsonData3
-{
-    public continueResult cont;
-}
-
-[Serializable]
-public class continueResult
-{
-    public string lhcontinue;
-}
-
 public class OneLinksToAllScript : MonoBehaviour {
 
     public KMAudio audio;
@@ -77,12 +15,13 @@ public class OneLinksToAllScript : MonoBehaviour {
     public Text[] texts;
 
     private List<string> queryLinks = new List<string>();
-    private string queryCheckURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhlimit=max";
-    private string queryGetURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1";
+    private string queryCheckURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhlimit=max&rnnamespace=0";
+    private string queryGetURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
     private string title1 = "";
     private string title2 = "";
     private string contvar;
     private bool error = false;
+    private bool activated = false;
 
     private List<string> addedArticles = new List<string>();
     private int curIndex = 0;
@@ -114,13 +53,14 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     void OnActivate()
     {
+        activated = true;
         load = StartCoroutine(Loading(0));
         StartCoroutine(QueryProcess());
     }
 
     void PressButton(KMSelectable pressed)
     {
-        if ((moduleSolved != true && load == null) || (pressed == buttons[4] && error))
+        if ((moduleSolved != true && load == null && activated) || (pressed == buttons[4] && error))
         {
             if (pressed == buttons[0] && !texts[1].text.Equals(""))
             {
@@ -418,14 +358,14 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     private IEnumerator QueryProcess()
     {
-        while (title1.Equals(title2) || title1.Contains(":") || title1.Contains("/"))
+        while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
             yield return www;
             if (www.error == null)
             {
-                jsonData result = JsonUtility.FromJson<jsonData>(www.text);
-                title1 = result.query.random[0].title;
+                var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
+                title1 = result["query"]["random"][0]["title"].ToObject<string>();
             }
             else
             {
@@ -437,14 +377,14 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
         }
         title2 = title1;
-        while (title1.Equals(title2) || title2.Contains(":") || title2.Contains("/"))
+        while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
             yield return www;
             if (www.error == null)
             {
-                jsonData result = JsonUtility.FromJson<jsonData>(www.text);
-                title2 = result.query.random[0].title;
+                var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
+                title2 = result["query"]["random"][0]["title"].ToObject<string>();
             }
             else
             {
@@ -667,15 +607,23 @@ public class OneLinksToAllScript : MonoBehaviour {
                 id = "\"" + id + "\"";
                 newurl = www.text.Replace(id, "\"id\"");
                 newurl = newurl.Replace("\"continue\"", "\"cont\"");
-                jsonData2 result = JsonUtility.FromJson<jsonData2>(newurl);
-                jsonData3 result2 = JsonUtility.FromJson<jsonData3>(newurl);
-                for (int i = 0; i < result.query.pages.id.linkshere.Count; i++)
+                var result = Newtonsoft.Json.Linq.JObject.Parse(newurl);
+                int count = 0;
+                while (true)
                 {
-                    queryLinks.Add(result.query.pages.id.linkshere[i].title);
+                    try
+                    {
+                        queryLinks.Add(result["query"]["pages"]["id"]["linkshere"][count]["title"].ToObject<string>());
+                        count++;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        break;
+                    }
                 }
-                if (result2.cont.lhcontinue != null)
+                if (newurl.Contains("\"cont\""))
                 {
-                    contvar = result2.cont.lhcontinue;
+                    contvar = result["cont"]["lhcontinue"].ToObject<string>();
                 }
                 else
                 {
