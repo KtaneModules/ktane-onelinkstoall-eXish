@@ -15,7 +15,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     public Text[] texts;
 
     private List<string> queryLinks = new List<string>();
-    private string queryCheckURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhlimit=max&rnnamespace=0";
+    private string queryCheckURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhlimit=max&lhnamespace=0";
     private string queryGetURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
     private string title1 = "";
     private string title2 = "";
@@ -358,6 +358,7 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     private IEnumerator QueryProcess()
     {
+        title1 = "Studiestræde 10";
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -377,6 +378,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
         }
         title2 = title1;
+        title2 = "Charfield";
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -411,7 +413,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
         if (loadlinks != null)
         {
-            StopCoroutine(load);
+            StopCoroutine(loadlinks);
             loadlinks = null;
         }
         if (!queryLinks.Contains(title1))
@@ -458,7 +460,12 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (addedArticles.Count == 0)
         {
             loadlinks = StartCoroutine(getQueryLinks(temp));
-            while (loadlinks != null) { yield return null; }
+            while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
+            if (loadlinks != null)
+            {
+                StopCoroutine(loadlinks);
+                loadlinks = null;
+            }
             if (!queryLinks.Contains(title1))
             {
                 Debug.LogFormat("[One Links To All #{0}] {1} -> {2} (X)", moduleId, title1, temp);
@@ -479,7 +486,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
                     if (loadlinks != null)
                     {
-                        StopCoroutine(load);
+                        StopCoroutine(loadlinks);
                         loadlinks = null;
                     }
                     if (!queryLinks.Contains(title1))
@@ -498,7 +505,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
                     if (loadlinks != null)
                     {
-                        StopCoroutine(load);
+                        StopCoroutine(loadlinks);
                         loadlinks = null;
                     }
                     if (!queryLinks.Contains(addedArticles[i - 1]))
@@ -517,7 +524,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
                     if (loadlinks != null)
                     {
-                        StopCoroutine(load);
+                        StopCoroutine(loadlinks);
                         loadlinks = null;
                     }
                     if (!queryLinks.Contains(addedArticles[i - 1]))
@@ -536,7 +543,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         while (loadlinks != null && !queryLinks.Contains(temp)) { yield return null; }
         if (loadlinks != null)
         {
-            StopCoroutine(load);
+            StopCoroutine(loadlinks);
             loadlinks = null;
         }
         if (!queryLinks.Contains(temp))
