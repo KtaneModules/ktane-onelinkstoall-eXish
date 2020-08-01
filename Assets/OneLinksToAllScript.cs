@@ -358,7 +358,6 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     private IEnumerator QueryProcess()
     {
-        title1 = "Studiestræde 10";
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -378,7 +377,6 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
         }
         title2 = title1;
-        title2 = "Charfield";
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -718,7 +716,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
-        if (load != null)
+        if (load != null || !activated)
         {
             yield return "sendtochaterror Buttons cannot be pressed right now as the module is currently generating the random articles!";
             yield break;
