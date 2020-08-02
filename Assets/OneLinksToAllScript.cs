@@ -358,6 +358,7 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     private IEnumerator QueryProcess()
     {
+        Debug.LogFormat("<One Links To All #{0}> Starting query of starting article...", moduleId, title1, title2);
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -376,7 +377,9 @@ public class OneLinksToAllScript : MonoBehaviour {
                 StopAllCoroutines();
             }
         }
+        Debug.LogFormat("<One Links To All #{0}> Query of starting article successful!", moduleId, title1, title2);
         title2 = title1;
+        Debug.LogFormat("<One Links To All #{0}> Starting query of finishing article...", moduleId, title1, title2);
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -395,6 +398,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 StopAllCoroutines();
             }
         }
+        Debug.LogFormat("<One Links To All #{0}> Query of finishing article successful!", moduleId, title1, title2);
         StopCoroutine(load);
         load = null;
         texts[0].text = title1;
@@ -407,8 +411,10 @@ public class OneLinksToAllScript : MonoBehaviour {
     {
         load = StartCoroutine(Loading(1));
         bool valid = true;
+        Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, title2);
         loadlinks = StartCoroutine(getQueryLinks(title2));
         while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
+        Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, title2);
         if (loadlinks != null)
         {
             StopCoroutine(loadlinks);
@@ -457,8 +463,10 @@ public class OneLinksToAllScript : MonoBehaviour {
         bool valid = true;
         if (addedArticles.Count == 0)
         {
+            Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, temp);
             loadlinks = StartCoroutine(getQueryLinks(temp));
             while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
+            Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, temp);
             if (loadlinks != null)
             {
                 StopCoroutine(loadlinks);
@@ -480,8 +488,10 @@ public class OneLinksToAllScript : MonoBehaviour {
             {
                 if (i == 0)
                 {
+                    Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, addedArticles[0]);
                     loadlinks = StartCoroutine(getQueryLinks(addedArticles[0]));
                     while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
+                    Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, addedArticles[0]);
                     if (loadlinks != null)
                     {
                         StopCoroutine(loadlinks);
@@ -499,8 +509,10 @@ public class OneLinksToAllScript : MonoBehaviour {
                 }
                 else if (i == addedArticles.Count)
                 {
+                    Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, addedArticles[i - 1], temp);
                     loadlinks = StartCoroutine(getQueryLinks(temp));
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
+                    Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, addedArticles[i - 1], temp);
                     if (loadlinks != null)
                     {
                         StopCoroutine(loadlinks);
@@ -518,8 +530,10 @@ public class OneLinksToAllScript : MonoBehaviour {
                 }
                 else
                 {
+                    Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, addedArticles[i - 1], addedArticles[i]);
                     loadlinks = StartCoroutine(getQueryLinks(addedArticles[i]));
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
+                    Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, addedArticles[i - 1], addedArticles[i]);
                     if (loadlinks != null)
                     {
                         StopCoroutine(loadlinks);
@@ -537,8 +551,10 @@ public class OneLinksToAllScript : MonoBehaviour {
                 }
             }
         }
+        Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, temp, title2);
         loadlinks = StartCoroutine(getQueryLinks(title2));
         while (loadlinks != null && !queryLinks.Contains(temp)) { yield return null; }
+        Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, temp, title2);
         if (loadlinks != null)
         {
             StopCoroutine(loadlinks);
