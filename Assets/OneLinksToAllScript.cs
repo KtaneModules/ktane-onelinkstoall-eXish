@@ -30,6 +30,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private char[] keySet2 = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
     private char[] keySet3 = new char[] { 'á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ì', 'ò', 'ù', 'ä', 'ë', 'ï', 'ö', 'ü', 'ā', 'ē', 'ī', 'ō', 'ū', 'ã', 'ñ', 'õ', ' ', ' ', ' ' };
     private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    private char[] keySetSolve = new char[] { 'C', 'O', 'N', 'G', 'R', 'A', 'T', 'U', 'L', 'A', 'T', 'I', 'O', 'N', 'S', 'Y', 'O', 'U', 'R', 'E', 'D', 'O', 'N', 'E', '!', ' ' };
     private int keyIndex = 0;
 
     private Coroutine load;
@@ -435,6 +436,62 @@ public class OneLinksToAllScript : MonoBehaviour {
         {
             Debug.LogFormat("[One Links To All #{0}] Submitted path is valid, module disarmed!", moduleId);
             moduleSolved = true;
+            audio.PlaySoundAtTransform("solve", transform);
+            for (int i = 5; i < 31; i++)
+            {
+                if (i == 11)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 14)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 15)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 16)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 17)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 20)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 21)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 27)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 29)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 30)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.15f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.001f, 0.0012f);
+                }
+                if (i == 30)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().text = ":)";
+                }
+                else
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().text = keySetSolve[i - 5].ToString();
+                }
+            }
             GetComponent<KMBombModule>().HandlePass();
         }
         else
@@ -575,6 +632,62 @@ public class OneLinksToAllScript : MonoBehaviour {
         {
             Debug.LogFormat("[One Links To All #{0}] Submitted path is valid, module disarmed!", moduleId);
             moduleSolved = true;
+            audio.PlaySoundAtTransform("solve", transform);
+            for (int i = 5; i < 31; i++)
+            {
+                if (i == 11)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 14)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 15)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 16)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 17)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 20)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 21)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 27)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 29)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 30)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.15f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.001f, 0.0012f);
+                }
+                if (i == 30)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().text = ":)";
+                }
+                else
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().text = keySetSolve[i - 5].ToString();
+                }
+            }
             GetComponent<KMBombModule>().HandlePass();
         }
         else
@@ -792,6 +905,8 @@ public class OneLinksToAllScript : MonoBehaviour {
                 yield break;
             }
             buttons[4].OnInteract();
+            yield return "solve";
+            yield return "strike";
             yield break;
         }
         string[] parameters = command.Split(' ');
@@ -806,6 +921,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     if (!keySet1.Contains(parameters[1][i]) && !keySet2.Contains(parameters[1][i]) && !keySet3.Contains(parameters[1][i]) && !keySet4.Contains(parameters[1][i]))
                     {
                         yield return "sendtochaterror The specified character to type '" + parameters[1][i] + "' is invalid!";
+                        yield break;
                     }
                 }
                 for (int i = 0; i < parameters[1].Length; i++)
