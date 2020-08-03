@@ -116,7 +116,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             else if (pressed == buttons[31] && keyIndex != 0)
             {
-                pressed.AddInteractionPunch(0.5f);
+                pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
                 keyIndex = 0;
                 for (int i = 5; i < 31; i++)
@@ -165,7 +165,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             else if (pressed == buttons[32] && keyIndex != 1)
             {
-                pressed.AddInteractionPunch(0.5f);
+                pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
                 keyIndex = 1;
                 for (int i = 5; i < 31; i++)
@@ -214,7 +214,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             else if (pressed == buttons[33] && keyIndex != 2)
             {
-                pressed.AddInteractionPunch(0.5f);
+                pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
                 keyIndex = 2;
                 for (int i = 5; i < 31; i++)
@@ -263,7 +263,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             else if (pressed == buttons[34] && keyIndex != 3)
             {
-                pressed.AddInteractionPunch(0.5f);
+                pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
                 keyIndex = 3;
                 for (int i = 5; i < 31; i++)
@@ -312,11 +312,11 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             else if (Array.IndexOf(buttons, pressed) > 4 && pressed != buttons[31] && pressed != buttons[32] && pressed != buttons[33] && pressed != buttons[34] && pressed.GetComponentInChildren<TextMesh>().text != " ")
             {
-                if (keyIndex == 2 && pressed == buttons[10])
+                if (keyIndex == 3 && pressed == buttons[15])
                 {
                     if (texts[1].text.Trim() != "")
                     {
-                        pressed.AddInteractionPunch(0.5f);
+                        pressed.AddInteractionPunch(0.25f);
                         audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
                         texts[1].text += " ";
                     }
@@ -327,7 +327,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 }
                 else
                 {
-                    pressed.AddInteractionPunch(0.5f);
+                    pressed.AddInteractionPunch(0.25f);
                     audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
                     texts[1].text += pressed.GetComponentInChildren<TextMesh>().text;
                 }
@@ -337,6 +337,8 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     private bool Valid()
     {
+        if (error)
+            return true;
         if (addedArticles.Count != 0 && texts[1].text != "")
         {
             return true;
@@ -810,12 +812,12 @@ public class OneLinksToAllScript : MonoBehaviour {
                 {
                     if (parameters[1][i].Equals(' '))
                     {
-                        if (keyIndex != 2)
+                        if (keyIndex != 3)
                         {
-                            buttons[33].OnInteract();
+                            buttons[34].OnInteract();
                             yield return new WaitForSeconds(0.1f);
                         }
-                        buttons[10].OnInteract();
+                        buttons[15].OnInteract();
                         yield return new WaitForSeconds(0.1f);
                     }
                     else if (keySet1.Contains(parameters[1][i]))
