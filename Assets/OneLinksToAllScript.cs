@@ -29,7 +29,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private char[] keySet1 = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
     private char[] keySet2 = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
     private char[] keySet3 = new char[] { 'á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ì', 'ò', 'ù', 'ä', 'ë', 'ï', 'ö', 'ü', 'ā', 'ē', 'ī', 'ō', 'ū', 'ã', 'ñ', 'õ', ' ', ' ', ' ' };
-    private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '–', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
     private char[] keySetSolve = new char[] { 'C', 'O', 'N', 'G', 'R', 'A', 'T', 'U', 'L', 'A', 'T', 'I', 'O', 'N', 'S', 'Y', 'O', 'U', 'R', 'E', 'D', 'O', 'N', 'E', '!', ' ' };
     private int keyIndex = 0;
 
@@ -298,7 +298,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     }
                     else if (i == 21)
                     {
-                        buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                        buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.1f, 0.51f);
                     }
                     else if(i == 27)
                     {
@@ -361,7 +361,7 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     private IEnumerator QueryProcess()
     {
-        Debug.LogFormat("<One Links To All #{0}> Starting query of starting article...", moduleId, title1, title2);
+        Debug.LogFormat("<One Links To All #{0}> Starting query of starting article...", moduleId);
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -380,9 +380,9 @@ public class OneLinksToAllScript : MonoBehaviour {
                 StopAllCoroutines();
             }
         }
-        Debug.LogFormat("<One Links To All #{0}> Query of starting article successful!", moduleId, title1, title2);
+        Debug.LogFormat("<One Links To All #{0}> Query of starting article successful! Found starting article: {1}", moduleId, title1);
         title2 = title1;
-        Debug.LogFormat("<One Links To All #{0}> Starting query of finishing article...", moduleId, title1, title2);
+        Debug.LogFormat("<One Links To All #{0}> Starting query of finishing article...", moduleId);
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
@@ -401,7 +401,9 @@ public class OneLinksToAllScript : MonoBehaviour {
                 StopAllCoroutines();
             }
         }
-        Debug.LogFormat("<One Links To All #{0}> Query of finishing article successful!", moduleId, title1, title2);
+        Debug.LogFormat("<One Links To All #{0}> Query of finishing article successful! Found finishing article: {1}", moduleId, title2);
+        Debug.LogFormat("<One Links To All #{0}> Starting query for path connecting {1} to {2}...", moduleId, title1, title2);
+        
         StopCoroutine(load);
         load = null;
         texts[0].text = title1;
@@ -916,6 +918,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             if (parameters.Length >= 2)
             {
                 parameters[1] = command.Substring(5, command.Length - 5);
+                parameters[1] = parameters[1].Replace("-", "–");
                 for (int i = 0; i < parameters[1].Length; i++)
                 {
                     if (!keySet1.Contains(parameters[1][i]) && !keySet2.Contains(parameters[1][i]) && !keySet3.Contains(parameters[1][i]) && !keySet4.Contains(parameters[1][i]))
