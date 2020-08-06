@@ -15,8 +15,9 @@ public class OneLinksToAllScript : MonoBehaviour {
     public Text[] texts;
 
     private List<string> queryLinks = new List<string>();
-    private string queryCheckURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhlimit=max&lhnamespace=0";
-    private string queryGetURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
+    private string queryCheckBackURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhprop=title&lhlimit=max&lhnamespace=0";
+    private string queryGetRandomURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
+    private string queryLeadsToURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=links&pllimit=1&plnamespace=0";
     private string title1 = "";
     private string title2 = "";
     private string contvar;
@@ -359,25 +360,46 @@ public class OneLinksToAllScript : MonoBehaviour {
         return false;
     }
 
+    private void DealWithError(int type)
+    {
+        if (type == 0)
+        {
+            texts[0].text = "Error: Failed the get a random article!";
+            texts[2].text = "Error: Failed the get a random article!";
+            Debug.LogFormat("[One Links To All #{0}] Error: Starting article query failed! Press submit to solve the module.", moduleId);
+            error = true;
+            StopAllCoroutines();
+        }
+        else if (type == 1)
+        {
+            texts[0].text = "Error: Failed to check if the path is valid!";
+            texts[1].text = "";
+            texts[2].text = "Error: Failed to check if the path is valid!";
+            Debug.LogFormat("[One Links To All #{0}] Error: Link query failed! Press submit to solve the module.", moduleId);
+            error = true;
+            StopAllCoroutines();
+        }
+    }
+
     private IEnumerator QueryProcess()
     {
         Debug.LogFormat("<One Links To All #{0}> Starting query of starting article...", moduleId);
         while (title1.Equals(title2))
         {
-            WWW www = new WWW(queryGetURL);
+            WWW www = new WWW(queryGetRandomURL);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
                 var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
                 title1 = result["query"]["random"][0]["title"].ToObject<string>();
+                loadlinks = StartCoroutine(getLeadsToLink(title1));
+                while (loadlinks != null) { yield return null; }
+                if (queryLinks.Count == 0)
+                    title1 = title2;
             }
             else
             {
-                texts[0].text = "Error: Failed the get a random article!";
-                texts[2].text = "Error: Failed the get a random article!";
-                Debug.LogFormat("[One Links To All #{0}] Error: Starting article query failed! Press submit to solve the module.", moduleId);
-                error = true;
-                StopAllCoroutines();
+                DealWithError(0);
             }
         }
         Debug.LogFormat("<One Links To All #{0}> Query of starting article successful! Found starting article: {1}", moduleId, title1);
@@ -385,25 +407,23 @@ public class OneLinksToAllScript : MonoBehaviour {
         Debug.LogFormat("<One Links To All #{0}> Starting query of finishing article...", moduleId);
         while (title1.Equals(title2))
         {
-            WWW www = new WWW(queryGetURL);
+            WWW www = new WWW(queryGetRandomURL);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
                 var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
                 title2 = result["query"]["random"][0]["title"].ToObject<string>();
+                loadlinks = StartCoroutine(getQueryLinks(title2, 0));
+                while (loadlinks != null) { yield return null; }
+                if (queryLinks.Count == 0)
+                    title2 = title1;
             }
             else
             {
-                texts[0].text = "Error: Failed the get a random article!";
-                texts[2].text = "Error: Failed the get a random article!";
-                Debug.LogFormat("[One Links To All #{0}] Error: Finishing article query failed! Press submit to solve the module.", moduleId);
-                error = true;
-                StopAllCoroutines();
+                DealWithError(0);
             }
         }
         Debug.LogFormat("<One Links To All #{0}> Query of finishing article successful! Found finishing article: {1}", moduleId, title2);
-        Debug.LogFormat("<One Links To All #{0}> Starting query for path connecting {1} to {2}...", moduleId, title1, title2);
-        
         StopCoroutine(load);
         load = null;
         texts[0].text = title1;
@@ -417,7 +437,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         load = StartCoroutine(Loading(1));
         bool valid = true;
         Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, title2);
-        loadlinks = StartCoroutine(getQueryLinks(title2));
+        loadlinks = StartCoroutine(getQueryLinks(title2, 1));
         while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
         Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, title2);
         if (loadlinks != null)
@@ -525,7 +545,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (addedArticles.Count == 0)
         {
             Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, temp);
-            loadlinks = StartCoroutine(getQueryLinks(temp));
+            loadlinks = StartCoroutine(getQueryLinks(temp, 1));
             while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
             Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, temp);
             if (loadlinks != null)
@@ -550,7 +570,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 if (i == 0)
                 {
                     Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, addedArticles[0]);
-                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[0]));
+                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[0], 1));
                     while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
                     Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, addedArticles[0]);
                     if (loadlinks != null)
@@ -571,7 +591,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 else if (i == addedArticles.Count)
                 {
                     Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, addedArticles[i - 1], temp);
-                    loadlinks = StartCoroutine(getQueryLinks(temp));
+                    loadlinks = StartCoroutine(getQueryLinks(temp, 1));
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
                     Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, addedArticles[i - 1], temp);
                     if (loadlinks != null)
@@ -592,7 +612,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 else
                 {
                     Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, addedArticles[i - 1], addedArticles[i]);
-                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[i]));
+                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[i], 1));
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
                     Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, addedArticles[i - 1], addedArticles[i]);
                     if (loadlinks != null)
@@ -613,7 +633,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
         }
         Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, temp, title2);
-        loadlinks = StartCoroutine(getQueryLinks(title2));
+        loadlinks = StartCoroutine(getQueryLinks(title2, 1));
         while (loadlinks != null && !queryLinks.Contains(temp)) { yield return null; }
         Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, temp, title2);
         if (loadlinks != null)
@@ -713,13 +733,55 @@ public class OneLinksToAllScript : MonoBehaviour {
         load = null;
     }
 
-    private IEnumerator getQueryLinks(string title)
+    private IEnumerator getLeadsToLink(string title)
+    {
+        queryLinks.Clear();
+        WWW www = new WWW(queryLeadsToURL + "&titles=" + title);
+        while (!www.isDone) { yield return null; };
+        if (www.error == null)
+        {
+            int index = www.text.IndexOf("pages") + 5;
+            int ct = 0;
+            string id = "";
+            string newurl = "";
+            while (ct < 2)
+            {
+                index++;
+                if (www.text[index].Equals('\"'))
+                {
+                    ct++;
+                }
+                else if (ct == 1)
+                {
+                    id += www.text[index];
+                }
+            }
+            id = "\"" + id + "\"";
+            newurl = www.text.Replace(id, "\"id\"");
+            var result = Newtonsoft.Json.Linq.JObject.Parse(newurl);
+            try
+            {
+                queryLinks.Add(result["query"]["pages"]["id"]["links"][0]["title"].ToObject<string>());
+            }
+            catch (NullReferenceException)
+            {
+                // Here in case it has nothing it links to
+            }
+        }
+        else
+        {
+            DealWithError(0);
+        }
+        loadlinks = null;
+    }
+
+    private IEnumerator getQueryLinks(string title, int type)
     {
         queryLinks.Clear();
         contvar = "temp";
         while (contvar != "")
         {
-            string urledit = queryCheckURL;
+            string urledit = queryCheckBackURL;
             if (contvar != "temp")
                 urledit += "&lhcontinue=" + contvar;
             WWW www = new WWW(urledit + "&titles=" + title);
@@ -756,6 +818,12 @@ public class OneLinksToAllScript : MonoBehaviour {
                     }
                     catch (ArgumentOutOfRangeException)
                     {
+                        // Here in case it runs out of articles on a page to add
+                        break;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // Here in case it is not a valid article
                         break;
                     }
                 }
@@ -770,12 +838,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             else
             {
-                texts[0].text = "Error: Failed to check if the path is valid!";
-                texts[1].text = "";
-                texts[2].text = "Error: Failed to check if the path is valid!";
-                Debug.LogFormat("[One Links To All #{0}] Error: Link query failed! Press submit to solve the module.", moduleId);
-                error = true;
-                StopAllCoroutines();
+                DealWithError(type);
             }
         }
         loadlinks = null;
