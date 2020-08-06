@@ -365,7 +365,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
-            yield return www;
+            while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
                 var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
@@ -386,7 +386,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         while (title1.Equals(title2))
         {
             WWW www = new WWW(queryGetURL);
-            yield return www;
+            while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
                 var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
@@ -723,7 +723,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             if (contvar != "temp")
                 urledit += "&lhcontinue=" + contvar;
             WWW www = new WWW(urledit + "&titles=" + title);
-            yield return www;
+            while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
                 int index = www.text.IndexOf("pages") + 5;
