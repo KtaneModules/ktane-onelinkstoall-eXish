@@ -784,7 +784,16 @@ public class OneLinksToAllScript : MonoBehaviour {
             string urledit = queryCheckBackURL;
             if (contvar != "temp")
                 urledit += "&lhcontinue=" + contvar;
-            WWW www = new WWW(urledit + "&titles=" + title);
+            string temp = "";
+            if (type == 0)
+            {
+                temp = urledit + "&lhshow=!redirect&titles=" + title;
+            }
+            else
+            {
+                temp = urledit + "&titles=" + title;
+            }
+            WWW www = new WWW(temp);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
