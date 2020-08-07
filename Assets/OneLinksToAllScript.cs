@@ -18,6 +18,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private string queryCheckBackURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhprop=title&lhlimit=max&lhnamespace=0";
     private string queryGetRandomURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
     private string queryLeadsToURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=links&pllimit=1&plnamespace=0";
+    private string queryDisambigURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageprops&ppprop=disambiguation";
     private string title1 = "";
     private string title2 = "";
     private string contvar;
@@ -417,6 +418,22 @@ public class OneLinksToAllScript : MonoBehaviour {
                 while (loadlinks != null) { yield return null; }
                 if (queryLinks.Count == 0)
                     title2 = title1;
+                else
+                {
+                    WWW www2 = new WWW(queryDisambigURL + "&titles=" + title2);
+                    while (!www2.isDone) { yield return null; };
+                    if (www2.error == null)
+                    {
+                        if (www2.text.Contains("\"disambiguation\":"))
+                        {
+                            title2 = title1;
+                        }
+                    }
+                    else
+                    {
+                        DealWithError(0);
+                    }
+                }
             }
             else
             {
@@ -787,7 +804,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             string temp = "";
             if (type == 0)
             {
-                temp = urledit + "&lhshow=!redirect&titles=" + title;
+                temp = urledit + "&lhshow=!redirect&ppprops=!disambiguation&titles=" + title;
             }
             else
             {
