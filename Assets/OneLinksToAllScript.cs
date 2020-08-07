@@ -804,7 +804,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             string temp = "";
             if (type == 0)
             {
-                temp = urledit + "&lhshow=!redirect&ppprops=!disambiguation&titles=" + title;
+                temp = urledit + "&lhshow=!redirect&titles=" + title;
             }
             else
             {
