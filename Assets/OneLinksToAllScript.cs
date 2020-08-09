@@ -15,6 +15,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     public Text[] texts;
 
     private List<string> queryLinks = new List<string>();
+    //private string[] blacklistedTerms = new string[] { "nigger;nigga;ku klux klan;adolf hitler;nazi;molest;beastiality;bestiality;zoophilia;chemical castration;fuck;ass;shit" };
     private string queryCheckBackURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhprop=title&lhlimit=max&lhnamespace=0";
     private string queryGetRandomURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
     private string queryLeadsToURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=links&pllimit=1&plnamespace=0";
@@ -31,7 +32,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private char[] keySet1 = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
     private char[] keySet2 = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
     private char[] keySet3 = new char[] { 'á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ì', 'ò', 'ù', 'ä', 'ë', 'ï', 'ö', 'ü', 'ā', 'ē', 'ī', 'ō', 'ū', 'ã', 'ñ', 'õ', ' ', ' ', ' ' };
-    private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '–', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '–', '-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
     private char[] keySetSolve = new char[] { 'C', 'O', 'N', 'G', 'R', 'A', 'T', 'U', 'L', 'A', 'T', 'I', 'O', 'N', 'S', 'Y', 'O', 'U', 'R', 'E', 'D', 'O', 'N', 'E', '!', ' ' };
     private int keyIndex = 0;
 
@@ -42,10 +43,17 @@ public class OneLinksToAllScript : MonoBehaviour {
     int moduleId;
     private bool moduleSolved;
 
+    //private OneLinksToAllSettings Settings = new OneLinksToAllSettings();
+
     void Awake()
     {
         moduleId = moduleIdCounter++;
         moduleSolved = false;
+        /**ModConfig<OneLinksToAllSettings> modConfig = new ModConfig<OneLinksToAllSettings>("OrganizationSettings");
+        //Read from the settings file, or create one if one doesn't exist
+        Settings = modConfig.Settings;
+        //Update the settings file incase there was an error during read
+        modConfig.Settings = Settings;*/
         foreach (KMSelectable obj in buttons)
         {
             KMSelectable pressed = obj;
@@ -155,6 +163,10 @@ public class OneLinksToAllScript : MonoBehaviour {
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
                     }
+                    else if (i == 22)
+                    {
+                        buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    }
                     else if(i == 27)
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0011f, 0.0012f, 0.0012f);
@@ -203,6 +215,10 @@ public class OneLinksToAllScript : MonoBehaviour {
                     else if (i == 21)
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.3f, 0.51f);
+                    }
+                    else if (i == 22)
+                    {
+                        buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
                     }
                     else if (i == 27)
                     {
@@ -253,6 +269,10 @@ public class OneLinksToAllScript : MonoBehaviour {
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
                     }
+                    else if (i == 22)
+                    {
+                        buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    }
                     else if(i == 27)
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
@@ -299,6 +319,10 @@ public class OneLinksToAllScript : MonoBehaviour {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.15f, 0.51f);
                     }
                     else if (i == 21)
+                    {
+                        buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.1f, 0.51f);
+                    }
+                    else if (i == 22)
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.1f, 0.51f);
                     }
@@ -1007,7 +1031,6 @@ public class OneLinksToAllScript : MonoBehaviour {
             if (parameters.Length >= 2)
             {
                 parameters[1] = command.Substring(5, command.Length - 5);
-                parameters[1] = parameters[1].Replace("-", "–");
                 for (int i = 0; i < parameters[1].Length; i++)
                 {
                     if (!keySet1.Contains(parameters[1][i]) && !keySet2.Contains(parameters[1][i]) && !keySet3.Contains(parameters[1][i]) && !keySet4.Contains(parameters[1][i]))
@@ -1159,4 +1182,25 @@ public class OneLinksToAllScript : MonoBehaviour {
             yield break;
         }
     }
+
+    /**class OneLinksToAllSettings
+    {
+        public bool disableExplicitContent = true;
+    }
+
+    static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
+    {
+        new Dictionary<string, object>
+        {
+            { "Filename", "OneLinksToAllSettings.json" },
+            { "Name", "One Links To All Settings" },
+            { "Listing", new List<Dictionary<string, object>>{
+                new Dictionary<string, object>
+                {
+                    { "Key", "disableExplicitContent" },
+                    { "Text", "If enabled, One Links To All will not generate starting and ending articles that contain explicit terms." }
+                },
+            } }
+        }
+    };*/
 }
