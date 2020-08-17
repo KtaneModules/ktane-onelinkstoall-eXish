@@ -5,6 +5,8 @@ using UnityEngine;
 using System.Text.RegularExpressions;
 using System;
 using UnityEngine.UI;
+using UnityEngine.Networking;
+using Newtonsoft.Json.Linq;
 
 public class OneLinksToAllScript : MonoBehaviour {
 
@@ -14,8 +16,10 @@ public class OneLinksToAllScript : MonoBehaviour {
     public KMSelectable[] buttons;
     public Text[] texts;
 
+    private List<string> explicitTerms = new List<string>();
+    private List<string> exceptions = new List<string>();
+
     private List<string> queryLinks = new List<string>();
-    //private string[] blacklistedTerms = new string[] { "nigger;nigga;ku klux klan;adolf hitler;nazi;molest;beastiality;bestiality;zoophilia;chemical castration;fuck;ass;shit" };
     private string queryCheckBackURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhprop=title&lhlimit=max&lhnamespace=0";
     private string queryGetRandomURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
     private string queryLeadsToURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=links&pllimit=1&plnamespace=0";
@@ -25,6 +29,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private string contvar;
     private bool error = false;
     private bool activated = false;
+    private bool getTerms = false;
 
     private List<string> addedArticles = new List<string>();
     private int curIndex = 0;
@@ -43,17 +48,22 @@ public class OneLinksToAllScript : MonoBehaviour {
     int moduleId;
     private bool moduleSolved;
 
-    //private OneLinksToAllSettings Settings = new OneLinksToAllSettings();
+    private OneLinksToAllSettings Settings = new OneLinksToAllSettings();
 
     void Awake()
     {
         moduleId = moduleIdCounter++;
         moduleSolved = false;
-        /**ModConfig<OneLinksToAllSettings> modConfig = new ModConfig<OneLinksToAllSettings>("OrganizationSettings");
+        ModConfig<OneLinksToAllSettings> modConfig = new ModConfig<OneLinksToAllSettings>("OneLinksToAllSettings");
         //Read from the settings file, or create one if one doesn't exist
         Settings = modConfig.Settings;
         //Update the settings file incase there was an error during read
-        modConfig.Settings = Settings;*/
+        modConfig.Settings = Settings;
+        Debug.LogFormat("[One Links To All #{0}] Explicit Filter: {1}", moduleId, Settings.disableExplicitContent ? "On" : "Off");
+        if (Settings.disableExplicitContent)
+        {
+            StartCoroutine(FillCensoringLists());
+        }
         foreach (KMSelectable obj in buttons)
         {
             KMSelectable pressed = obj;
@@ -404,18 +414,80 @@ public class OneLinksToAllScript : MonoBehaviour {
             error = true;
             StopAllCoroutines();
         }
+        else if (type == 2)
+        {
+            texts[0].text = "Error: Failed to grab explicit terms and exceptions!";
+            texts[2].text = "Error: Failed to grab explicit terms and exceptions!";
+            Debug.LogFormat("[One Links To All #{0}] Error: Explicit terms and exceptions query failed! Press submit to solve the module.", moduleId);
+            error = true;
+            StopAllCoroutines();
+        }
+    }
+
+    private bool Censored(string article)
+    {
+        if (Settings.disableExplicitContent)
+        {
+            article = article.ToLower();
+            if (exceptions.Contains(article))
+            {
+                return true;
+            }
+            else
+            {
+                for (int i = 0; i < explicitTerms.Count; i++)
+                {
+                    if (article.Contains(explicitTerms[i]))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private IEnumerator FillCensoringLists()
+    {
+        getTerms = true;
+        Debug.LogFormat("<One Links To All #{0}> Starting query of explicit terms and exceptions due to enabled filter...", moduleId);
+        UnityWebRequest www = UnityWebRequest.Get("https://spreadsheets.google.com/feeds/list/1J-AanIiu6-mcIa9sw18fdBomRluQiCnhdWMaL-OcGSc/1/public/values?alt=json");
+        yield return www.SendWebRequest();
+        if (www.error == null)
+        {
+            foreach (var entry in JObject.Parse(www.downloadHandler.text)["feed"]["entry"])
+            {
+                explicitTerms.Add(entry["gsx$bannedterms"].Value<string>("$t").ToLower());
+                exceptions.Add(entry["gsx$exceptions"].Value<string>("$t").ToLower());
+            }
+            if (explicitTerms.Contains(""))
+                explicitTerms.Remove("");
+            if (exceptions.Contains(""))
+                exceptions.Remove("");
+        }
+        else
+        {
+            DealWithError(2);
+        }
+        Debug.LogFormat("<One Links To All #{0}> Query of explicit terms and exceptions successful!", moduleId);
+        getTerms = false;
     }
 
     private IEnumerator QueryProcess()
     {
+        while (getTerms) { yield return null; };
         Debug.LogFormat("<One Links To All #{0}> Starting query of starting article...", moduleId);
-        while (title1.Equals(title2))
+        while (title1.Equals(title2) || !Censored(title1))
         {
             WWW www = new WWW(queryGetRandomURL);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
-                var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
+                var result = JObject.Parse(www.text);
                 title1 = result["query"]["random"][0]["title"].ToObject<string>();
                 loadlinks = StartCoroutine(getLeadsToLink(title1));
                 while (loadlinks != null) { yield return null; }
@@ -430,13 +502,13 @@ public class OneLinksToAllScript : MonoBehaviour {
         Debug.LogFormat("<One Links To All #{0}> Query of starting article successful! Found starting article: {1}", moduleId, title1);
         title2 = title1;
         Debug.LogFormat("<One Links To All #{0}> Starting query of finishing article...", moduleId);
-        while (title1.Equals(title2))
+        while (title1.Equals(title2) || !Censored(title2))
         {
             WWW www = new WWW(queryGetRandomURL);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
             {
-                var result = Newtonsoft.Json.Linq.JObject.Parse(www.text);
+                var result = JObject.Parse(www.text);
                 title2 = result["query"]["random"][0]["title"].ToObject<string>();
                 loadlinks = StartCoroutine(getQueryLinks(title2, 0));
                 while (loadlinks != null) { yield return null; }
@@ -1183,7 +1255,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         }
     }
 
-    /**class OneLinksToAllSettings
+    class OneLinksToAllSettings
     {
         public bool disableExplicitContent = true;
     }
@@ -1198,9 +1270,9 @@ public class OneLinksToAllScript : MonoBehaviour {
                 new Dictionary<string, object>
                 {
                     { "Key", "disableExplicitContent" },
-                    { "Text", "If enabled, One Links To All will not generate starting and ending articles that contain explicit terms." }
+                    { "Text", "If enabled, One Links To All will try not generate starting and ending articles that contain explicit terms." }
                 },
             } }
         }
-    };*/
+    };
 }
