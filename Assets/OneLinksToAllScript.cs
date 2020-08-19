@@ -461,13 +461,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         {
             foreach (var entry in JObject.Parse(www.downloadHandler.text)["feed"]["entry"])
             {
-                explicitTerms.Add(entry["gsx$bannedterms"].Value<string>("$t").ToLower());
-                exceptions.Add(entry["gsx$exceptions"].Value<string>("$t").ToLower());
+                if (!entry["gsx$bannedterms"].Value<string>("$t").ToLower().Equals(""))
+                    explicitTerms.Add(entry["gsx$bannedterms"].Value<string>("$t").ToLower());
+                if (!entry["gsx$exceptions"].Value<string>("$t").ToLower().Equals(""))
+                    exceptions.Add(entry["gsx$exceptions"].Value<string>("$t").ToLower());
             }
-            if (explicitTerms.Contains(""))
-                explicitTerms.Remove("");
-            if (exceptions.Contains(""))
-                exceptions.Remove("");
         }
         else
         {
