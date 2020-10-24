@@ -26,6 +26,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private string queryDisambigURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageprops&ppprop=disambiguation";
     private string title1 = "";
     private string title2 = "";
+    private string temp = "";
     private string contvar;
     private bool error = false;
     private bool activated = false;
@@ -40,6 +41,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '–', '-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
     private char[] keySetSolve = new char[] { 'C', 'O', 'N', 'G', 'R', 'A', 'T', 'U', 'L', 'A', 'T', 'I', 'O', 'N', 'S', 'Y', 'O', 'U', 'R', 'E', 'D', 'O', 'N', 'E', '!', ' ' };
     private int keyIndex = 0;
+    private int submit = -1;
 
     private Coroutine load;
     private Coroutine loadlinks;
@@ -124,15 +126,101 @@ public class OneLinksToAllScript : MonoBehaviour {
                     GetComponent<KMBombModule>().HandlePass();
                     return;
                 }
-                Debug.LogFormat("[One Links To All #{0}] ==Submitted Path==", moduleId);
-                texts[3].text = "";
-                if (texts[1].text == "" && addedArticles.Count == 0)
+                if (submit == -1)
                 {
-                    StartCoroutine(noSub());
+                    Debug.LogFormat("[One Links To All #{0}] ==Submitted Path==", moduleId);
+                    temp = texts[1].text;
+                    texts[3].text = "";
+                    if (texts[1].text == "" && addedArticles.Count == 0)
+                    {
+                        StartCoroutine(noSub());
+                    }
+                    else
+                    {
+                        StartCoroutine(finalCheck());
+                    }
+                }
+                else if (submit == 0)
+                {
+                    Debug.LogFormat("[One Links To All #{0}] Submitted path is valid, module disarmed!", moduleId);
+                    moduleSolved = true;
+                    audio.PlaySoundAtTransform("solve", transform);
+                    for (int i = 5; i < 31; i++)
+                    {
+                        if (i == 11)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                        }
+                        else if (i == 14)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                        }
+                        else if (i == 15)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                        }
+                        else if (i == 16)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                        }
+                        else if (i == 17)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                        }
+                        else if (i == 20)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                        }
+                        else if (i == 21)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                        }
+                        else if (i == 27)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                        }
+                        else if (i == 29)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                        }
+                        else if (i == 30)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.15f, 0.51f);
+                            buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.001f, 0.0012f);
+                        }
+                        if (i == 30)
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().text = ":)";
+                        }
+                        else
+                        {
+                            buttons[i].GetComponentInChildren<TextMesh>().text = keySetSolve[i - 5].ToString();
+                        }
+                    }
+                    GetComponent<KMBombModule>().HandlePass();
+                    texts[0].text = "";
+                    texts[1].text = "GG";
+                    texts[2].text = "";
+                    texts[3].text = "";
                 }
                 else
                 {
-                    StartCoroutine(finalCheck());
+                    submit = -1;
+                    Debug.LogFormat("[One Links To All #{0}] Submitted path is invalid, Strike!", moduleId);
+                    GetComponent<KMBombModule>().HandleStrike();
+                    if (submit == 1)
+                    {
+                        texts[1].text = "";
+                        texts[3].text = 1.ToString();
+                    }
+                    else
+                    {
+                        texts[1].text = temp;
+                        texts[3].text = (curIndex + 1).ToString();
+                    }
                 }
             }
             else if (pressed == buttons[31] && keyIndex != 0)
@@ -177,7 +265,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
                     }
-                    else if(i == 27)
+                    else if (i == 27)
                     {
                         buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0011f, 0.0012f, 0.0012f);
                     }
@@ -567,90 +655,19 @@ public class OneLinksToAllScript : MonoBehaviour {
         }
         if (valid)
         {
-            Debug.LogFormat("[One Links To All #{0}] Submitted path is valid, module disarmed!", moduleId);
-            moduleSolved = true;
-            audio.PlaySoundAtTransform("solve", transform);
-            for (int i = 5; i < 31; i++)
-            {
-                if (i == 11)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 14)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 15)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 16)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 17)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 20)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 21)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 27)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 29)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 30)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.15f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.001f, 0.0012f);
-                }
-                if (i == 30)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().text = ":)";
-                }
-                else
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().text = keySetSolve[i - 5].ToString();
-                }
-            }
-            GetComponent<KMBombModule>().HandlePass();
+            submit = 0;
         }
         else
         {
-            Debug.LogFormat("[One Links To All #{0}] Submitted path is invalid, Strike!", moduleId);
-            GetComponent<KMBombModule>().HandleStrike();
+            submit = 1;
         }
         StopCoroutine(load);
-        if (moduleSolved)
-        {
-            texts[0].text = "";
-            texts[1].text = "GG";
-            texts[2].text = "";
-            texts[3].text = "";
-        }
-        else
-        {
-            texts[1].text = "";
-            texts[3].text = 1.ToString();
-        }
+        texts[1].text = "✓";
         load = null;
     }
 
     private IEnumerator finalCheck()
     {
-        string temp = texts[1].text;
         load = StartCoroutine(Loading(1));
         bool valid = true;
         if (addedArticles.Count == 0)
@@ -763,84 +780,14 @@ public class OneLinksToAllScript : MonoBehaviour {
         }
         if (valid)
         {
-            Debug.LogFormat("[One Links To All #{0}] Submitted path is valid, module disarmed!", moduleId);
-            moduleSolved = true;
-            audio.PlaySoundAtTransform("solve", transform);
-            for (int i = 5; i < 31; i++)
-            {
-                if (i == 11)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 14)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 15)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 16)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 17)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 20)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 21)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 27)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
-                }
-                else if (i == 29)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
-                }
-                else if (i == 30)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.15f, 0.51f);
-                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.001f, 0.0012f);
-                }
-                if (i == 30)
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().text = ":)";
-                }
-                else
-                {
-                    buttons[i].GetComponentInChildren<TextMesh>().text = keySetSolve[i - 5].ToString();
-                }
-            }
-            GetComponent<KMBombModule>().HandlePass();
+            submit = 0;
         }
         else
         {
-            Debug.LogFormat("[One Links To All #{0}] Submitted path is invalid, Strike!", moduleId);
-            GetComponent<KMBombModule>().HandleStrike();
+            submit = 2;
         }
         StopCoroutine(load);
-        if (moduleSolved)
-        {
-            texts[0].text = "";
-            texts[1].text = "GG";
-            texts[2].text = "";
-            texts[3].text = "";
-        }
-        else
-        {
-            texts[1].text = temp;
-            texts[3].text = (curIndex + 1).ToString();
-        }
+        texts[1].text = "✓";
         load = null;
     }
 
@@ -895,15 +842,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             string urledit = queryCheckBackURL;
             if (contvar != "temp")
                 urledit += "&lhcontinue=" + contvar;
-            string temp = "";
-            if (type == 0)
-            {
-                temp = urledit + "&lhshow=!redirect&titles=" + title;
-            }
-            else
-            {
-                temp = urledit + "&titles=" + title;
-            }
+            string temp = urledit + "&titles=" + title;
             WWW www = new WWW(temp);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
@@ -1034,7 +973,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     {
         if (load != null || !activated)
         {
-            yield return "sendtochaterror Buttons cannot be pressed right now as the module is currently generating the random articles!";
+            yield return "sendtochaterror Buttons cannot be pressed right now!";
             yield break;
         }
         if (Regex.IsMatch(command, @"^\s*add\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
@@ -1090,8 +1029,6 @@ public class OneLinksToAllScript : MonoBehaviour {
                 yield break;
             }
             buttons[4].OnInteract();
-            yield return "solve";
-            yield return "strike";
             yield break;
         }
         string[] parameters = command.Split(' ');
