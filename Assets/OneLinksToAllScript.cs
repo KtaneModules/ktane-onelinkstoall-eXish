@@ -20,10 +20,13 @@ public class OneLinksToAllScript : MonoBehaviour {
     private List<string> exceptions = new List<string>();
 
     private List<string> queryLinks = new List<string>();
+    private List<string> exampleSolution = new List<string>();
+    private int repeats = 0;
+    private int curCount = 0;
     private string queryCheckBackURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=linkshere&lhprop=title&lhlimit=max&lhnamespace=0";
     private string queryGetRandomURL = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0";
-    private string queryLeadsToURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=links&pllimit=1&plnamespace=0";
-    private string queryDisambigURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageprops&ppprop=disambiguation";
+    private string queryLeadsToURL = "http://en.wikipedia.org/w/api.php?action=query&format=json&prop=links&pllimit=max&plnamespace=0";
+    private string queryRedirectCheck = "https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvslots=*&rvprop=content&formatversion=2";
     private string title1 = "";
     private string title2 = "";
     private string temp = "";
@@ -83,7 +86,7 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     void PressButton(KMSelectable pressed)
     {
-        if ((moduleSolved != true && load == null && activated) || (pressed == buttons[4] && error))
+        if ((moduleSolved != true && load == null && activated) || (moduleSolved != true && pressed == buttons[4] && error))
         {
             if (pressed == buttons[0] && !texts[1].text.Equals(""))
             {
@@ -216,7 +219,6 @@ public class OneLinksToAllScript : MonoBehaviour {
                 }
                 else
                 {
-                    submit = -1;
                     Debug.LogFormat("[One Links To All #{0}] Submitted path is invalid, Strike!", moduleId);
                     GetComponent<KMBombModule>().HandleStrike();
                     if (submit == 1)
@@ -229,6 +231,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                         texts[1].text = temp;
                         texts[3].text = (curIndex + 1).ToString();
                     }
+                    submit = -1;
                 }
             }
             else if (pressed == buttons[31] && keyIndex != 0)
@@ -511,9 +514,9 @@ public class OneLinksToAllScript : MonoBehaviour {
     {
         if (type == 0)
         {
-            texts[0].text = "Error: Failed the get a random article!";
-            texts[2].text = "Error: Failed the get a random article!";
-            Debug.LogFormat("[One Links To All #{0}] Error: Starting article query failed! Press submit to solve the module.", moduleId);
+            texts[0].text = "Error: Failed to get a random article!";
+            texts[2].text = "Error: Failed to get a random article!";
+            Debug.LogFormat("[One Links To All #{0}] Error: Starting/finishing article query failed! Press submit to solve the module.", moduleId);
             error = true;
             StopAllCoroutines();
         }
@@ -563,6 +566,18 @@ public class OneLinksToAllScript : MonoBehaviour {
         }
     }
 
+    private char HasValidChars(string title)
+    {
+        for (int i = 0; i < title.Length; i++)
+        {
+            if (!keySet1.Contains(title[i]) && !keySet2.Contains(title[i]) && !keySet3.Contains(title[i]) && !keySet4.Contains(title[i]))
+            {
+                return title[i];
+            }
+        }
+        return ' ';
+    }
+
     private IEnumerator FillCensoringLists()
     {
         getTerms = true;
@@ -609,42 +624,51 @@ public class OneLinksToAllScript : MonoBehaviour {
                 DealWithError(0);
             }
         }
+        exampleSolution.Add(title1);
         Debug.LogFormat("<One Links To All #{0}> Query of starting article successful! Found starting article: {1}", moduleId, title1);
+        exampleSolution.Add(queryLinks.PickRandom());
         title2 = title1;
         Debug.LogFormat("<One Links To All #{0}> Starting query of finishing article...", moduleId);
-        while (title1.Equals(title2) || !Censored(title2))
+        repeats = UnityEngine.Random.Range(2, 6);
+        redo:
+        while (title1.Equals(title2))
         {
-            WWW www = new WWW(queryGetRandomURL);
-            while (!www.isDone) { yield return null; };
-            if (www.error == null)
+            if (curCount < repeats)
             {
-                var result = JObject.Parse(www.text);
-                title2 = result["query"]["random"][0]["title"].ToObject<string>();
-                loadlinks = StartCoroutine(getQueryLinks(title2, 0));
+                loadlinks = StartCoroutine(getLeadsToLink(exampleSolution.Last()));
                 while (loadlinks != null) { yield return null; }
-                if (queryLinks.Count == 0)
-                    title2 = title1;
-                else
+                if (queryLinks.Count == 0 && curCount != 0)
+                    title2 = exampleSolution[exampleSolution.Count - 1];
+                else if (queryLinks.Count == 0 && curCount == 0)
                 {
-                    WWW www2 = new WWW(queryDisambigURL + "&titles=" + title2);
-                    while (!www2.isDone) { yield return null; };
-                    if (www2.error == null)
-                    {
-                        if (www2.text.Contains("\"disambiguation\":"))
-                        {
-                            title2 = title1;
-                        }
-                    }
-                    else
-                    {
-                        DealWithError(0);
-                    }
+                    exampleSolution.Remove(exampleSolution.Last());
+                    loadlinks = StartCoroutine(getLeadsToLink(title1));
+                    while (loadlinks != null) { yield return null; }
+                    exampleSolution.Add(queryLinks.PickRandom());
+                    curCount--;
                 }
+                else
+                    exampleSolution.Add(queryLinks.PickRandom());
             }
             else
+                title2 = exampleSolution.Last();
+            curCount++;
+        }
+        WWW www2 = new WWW(queryRedirectCheck + "&titles=" + title2);
+        while (!www2.isDone) { yield return null; };
+        if (www2.error == null)
+        {
+            if (www2.text.ToUpper().Contains("#REDIRECT"))
             {
-                DealWithError(0);
+                exampleSolution.Remove(exampleSolution.Last());
+                curCount--;
+                title2 = title1;
+                goto redo;
             }
+        }
+        else
+        {
+            DealWithError(0);
         }
         Debug.LogFormat("<One Links To All #{0}> Query of finishing article successful! Found finishing article: {1}", moduleId, title2);
         StopCoroutine(load);
@@ -653,6 +677,8 @@ public class OneLinksToAllScript : MonoBehaviour {
         texts[2].text = title2;
         texts[3].text = 1.ToString();
         Debug.LogFormat("[One Links To All #{0}] The starting article is titled {1} and the ending article is titled {2}", moduleId, title1, title2);
+        Debug.LogFormat("[One Links To All #{0}] ==One Possible Path==", moduleId);
+        Debug.LogFormat("[One Links To All #{0}] {1}", moduleId, exampleSolution.Join(" => "));
     }
 
     private IEnumerator noSub()
@@ -660,7 +686,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         load = StartCoroutine(Loading(1));
         bool valid = true;
         Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, title2);
-        loadlinks = StartCoroutine(getQueryLinks(title2, 1));
+        loadlinks = StartCoroutine(getQueryLinks(title2));
         while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
         Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, title2);
         if (loadlinks != null)
@@ -697,7 +723,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (addedArticles.Count == 0)
         {
             Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, temp);
-            loadlinks = StartCoroutine(getQueryLinks(temp, 1));
+            loadlinks = StartCoroutine(getQueryLinks(temp));
             while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
             Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, temp);
             if (loadlinks != null)
@@ -722,7 +748,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 if (i == 0)
                 {
                     Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, title1, addedArticles[0]);
-                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[0], 1));
+                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[0]));
                     while (loadlinks != null && !queryLinks.Contains(title1)) { yield return null; }
                     Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, title1, addedArticles[0]);
                     if (loadlinks != null)
@@ -743,7 +769,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 else if (i == addedArticles.Count)
                 {
                     Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, addedArticles[i - 1], temp);
-                    loadlinks = StartCoroutine(getQueryLinks(temp, 1));
+                    loadlinks = StartCoroutine(getQueryLinks(temp));
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
                     Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, addedArticles[i - 1], temp);
                     if (loadlinks != null)
@@ -764,7 +790,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 else
                 {
                     Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, addedArticles[i - 1], addedArticles[i]);
-                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[i], 1));
+                    loadlinks = StartCoroutine(getQueryLinks(addedArticles[i]));
                     while (loadlinks != null && !queryLinks.Contains(addedArticles[i - 1])) { yield return null; }
                     Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, addedArticles[i - 1], addedArticles[i]);
                     if (loadlinks != null)
@@ -785,7 +811,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
         }
         Debug.LogFormat("<One Links To All #{0}> Starting query for {1} linking to {2}...", moduleId, temp, title2);
-        loadlinks = StartCoroutine(getQueryLinks(title2, 1));
+        loadlinks = StartCoroutine(getQueryLinks(title2));
         while (loadlinks != null && !queryLinks.Contains(temp)) { yield return null; }
         Debug.LogFormat("<One Links To All #{0}> Query of {1} linking to {2} successful!", moduleId, temp, title2);
         if (loadlinks != null)
@@ -818,48 +844,80 @@ public class OneLinksToAllScript : MonoBehaviour {
     private IEnumerator getLeadsToLink(string title)
     {
         queryLinks.Clear();
-        WWW www = new WWW(queryLeadsToURL + "&titles=" + title);
-        while (!www.isDone) { yield return null; };
-        if (www.error == null)
+        contvar = "temp";
+        while (contvar != "")
         {
-            int index = www.text.IndexOf("pages") + 5;
-            int ct = 0;
-            string id = "";
-            string newurl = "";
-            while (ct < 2)
+            string urledit = queryLeadsToURL;
+            if (contvar != "temp")
+                urledit += "&plcontinue=" + contvar;
+            string temp = urledit + "&titles=" + title;
+            WWW www = new WWW(temp);
+            while (!www.isDone) { yield return null; };
+            if (www.error == null)
             {
-                index++;
-                if (www.text[index].Equals('\"'))
+                int index = www.text.IndexOf("pages") + 5;
+                int ct = 0;
+                string id = "";
+                string newurl = "";
+                while (ct < 2)
                 {
-                    ct++;
+                    index++;
+                    if (www.text[index].Equals('\"'))
+                    {
+                        ct++;
+                    }
+                    else if (ct == 1)
+                    {
+                        id += www.text[index];
+                    }
                 }
-                else if (ct == 1)
+                id = "\"" + id + "\"";
+                newurl = www.text.Replace(id, "\"id\"");
+                newurl = newurl.Replace("\"continue\"", "\"cont\"");
+                var result = JObject.Parse(newurl);
+                int count = 0;
+                while (true)
                 {
-                    id += www.text[index];
+                    try
+                    {
+                        string check = result["query"]["pages"]["id"]["links"][count]["title"].ToObject<string>();
+                        if ((curCount == (repeats - 1) && Censored(check) && !exampleSolution.Contains(check)) || (curCount != (repeats - 1) && Censored(check) && HasValidChars(check) == ' ' && !exampleSolution.Contains(check)))
+                            queryLinks.Add(check);
+                        count++;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        // Here in case it runs out of articles on a page to add
+                        break;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // Here in case it is not a valid article
+                        break;
+                    }
+                }
+                if (newurl.Contains("\"cont\""))
+                {
+                    contvar = result["cont"]["plcontinue"].ToObject<string>();
+                }
+                else
+                {
+                    contvar = "";
                 }
             }
-            id = "\"" + id + "\"";
-            newurl = www.text.Replace(id, "\"id\"");
-            var result = Newtonsoft.Json.Linq.JObject.Parse(newurl);
-            try
+            else
             {
-                queryLinks.Add(result["query"]["pages"]["id"]["links"][0]["title"].ToObject<string>());
+                DealWithError(0);
             }
-            catch (NullReferenceException)
-            {
-                // Here in case it has nothing it links to
-            }
-        }
-        else
-        {
-            DealWithError(0);
         }
         loadlinks = null;
     }
 
-    private IEnumerator getQueryLinks(string title, int type)
+    private IEnumerator getQueryLinks(string title)
     {
         queryLinks.Clear();
+        if (exampleSolution.Contains(title) && title != title1)
+            queryLinks.Add(exampleSolution[exampleSolution.IndexOf(title) - 1]);
         contvar = "temp";
         while (contvar != "")
         {
@@ -890,13 +948,15 @@ public class OneLinksToAllScript : MonoBehaviour {
                 id = "\"" + id + "\"";
                 newurl = www.text.Replace(id, "\"id\"");
                 newurl = newurl.Replace("\"continue\"", "\"cont\"");
-                var result = Newtonsoft.Json.Linq.JObject.Parse(newurl);
+                var result = JObject.Parse(newurl);
                 int count = 0;
                 while (true)
                 {
                     try
                     {
-                        queryLinks.Add(result["query"]["pages"]["id"]["linkshere"][count]["title"].ToObject<string>());
+                        string check = result["query"]["pages"]["id"]["linkshere"][count]["title"].ToObject<string>();
+                        if (!queryLinks.Contains(check))
+                            queryLinks.Add(check);
                         count++;
                     }
                     catch (ArgumentOutOfRangeException)
@@ -921,7 +981,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             else
             {
-                DealWithError(type);
+                DealWithError(1);
             }
         }
         loadlinks = null;
@@ -1062,13 +1122,11 @@ public class OneLinksToAllScript : MonoBehaviour {
             if (parameters.Length >= 2)
             {
                 parameters[1] = command.Substring(5, command.Length - 5);
-                for (int i = 0; i < parameters[1].Length; i++)
+                char check = HasValidChars(parameters[1]);
+                if (check != ' ')
                 {
-                    if (!keySet1.Contains(parameters[1][i]) && !keySet2.Contains(parameters[1][i]) && !keySet3.Contains(parameters[1][i]) && !keySet4.Contains(parameters[1][i]))
-                    {
-                        yield return "sendtochaterror The specified character to type '" + parameters[1][i] + "' is invalid!";
-                        yield break;
-                    }
+                    yield return "sendtochaterror The specified character to type '" + check + "' is invalid!";
+                    yield break;
                 }
                 for (int i = 0; i < parameters[1].Length; i++)
                 {
@@ -1211,6 +1269,125 @@ public class OneLinksToAllScript : MonoBehaviour {
                 yield return "sendtochaterror Please specify the number of times to press delete button!";
             }
             yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (load != null && !activated) { yield return true; }
+        if (error || submit == 0)
+        {
+            buttons[4].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        else if (submit == 1 || submit == 2)
+        {
+            moduleSolved = true;
+            audio.PlaySoundAtTransform("solve", transform);
+            for (int i = 5; i < 31; i++)
+            {
+                if (i == 11)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 14)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 15)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 16)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 17)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 20)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 21)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 22)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 23)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 27)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.0012f, 0.0012f);
+                }
+                else if (i == 29)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0f, 0.51f);
+                }
+                else if (i == 30)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, -0.15f, 0.51f);
+                    buttons[i].GetComponentInChildren<TextMesh>().gameObject.transform.localScale = new Vector3(0.0012f, 0.001f, 0.0012f);
+                }
+                if (i == 30)
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().text = ":)";
+                }
+                else
+                {
+                    buttons[i].GetComponentInChildren<TextMesh>().text = keySetSolve[i - 5].ToString();
+                }
+            }
+            GetComponent<KMBombModule>().HandlePass();
+            texts[0].text = "";
+            texts[1].text = "GG";
+            texts[2].text = "";
+            texts[3].text = "";
+        }
+        else
+        {
+            for (int i = 0; i < curCount - 1; i++)
+            {
+                if (addedArticles.Count == i)
+                    break;
+                else if (exampleSolution[i + 1] != addedArticles[i])
+                {
+                    while (addedArticles.Count != i)
+                    {
+                        buttons[1].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    break;
+                }
+            }
+            if (texts[1].text != exampleSolution[curIndex + 1])
+            {
+                buttons[3].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            int start = curIndex + 1;
+            for (int i = start; i < exampleSolution.Count - 1; i++)
+            {
+                if (texts[1].text == "")
+                    yield return ProcessTwitchCommand("type " + exampleSolution[i]);
+                if (i != (exampleSolution.Count - 2))
+                {
+                    buttons[0].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+            buttons[4].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+            buttons[4].OnInteract();
         }
     }
 
