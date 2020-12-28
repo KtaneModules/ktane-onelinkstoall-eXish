@@ -916,8 +916,12 @@ public class OneLinksToAllScript : MonoBehaviour {
     private IEnumerator getQueryLinks(string title)
     {
         queryLinks.Clear();
+        bool docheck = false;
         if (exampleSolution.Contains(title) && title != title1)
+        {
+            docheck = true;
             queryLinks.Add(exampleSolution[exampleSolution.IndexOf(title) - 1]);
+        }
         contvar = "temp";
         while (contvar != "")
         {
@@ -955,7 +959,12 @@ public class OneLinksToAllScript : MonoBehaviour {
                     try
                     {
                         string check = result["query"]["pages"]["id"]["linkshere"][count]["title"].ToObject<string>();
-                        if (!queryLinks.Contains(check))
+                        if (docheck)
+                        {
+                            if (check != exampleSolution[exampleSolution.IndexOf(title) - 1])
+                                queryLinks.Add(check);
+                        }
+                        else
                             queryLinks.Add(check);
                         count++;
                     }
