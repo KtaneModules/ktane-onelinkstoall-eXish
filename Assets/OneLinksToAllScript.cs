@@ -648,7 +648,19 @@ public class OneLinksToAllScript : MonoBehaviour {
                     curCount--;
                 }
                 else
+                {
                     exampleSolution.Add(queryLinks.PickRandom());
+                    if (curCount == (repeats - 1))
+                    {
+                        loadlinks = StartCoroutine(getLeadsToLink(exampleSolution.Last()));
+                        while (loadlinks != null) { yield return null; }
+                        if (queryLinks.Count == 0)
+                        {
+                            exampleSolution.Remove(exampleSolution.Last());
+                            curCount--;
+                        }
+                    }
+                }
             }
             else
                 title2 = exampleSolution.Last();
