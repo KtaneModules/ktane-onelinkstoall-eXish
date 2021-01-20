@@ -650,21 +650,27 @@ public class OneLinksToAllScript : MonoBehaviour {
                 else
                 {
                     exampleSolution.Add(queryLinks.PickRandom());
-                    if (curCount == (repeats - 1))
-                    {
-                        loadlinks = StartCoroutine(getLeadsToLink(exampleSolution.Last()));
-                        while (loadlinks != null) { yield return null; }
-                        if (queryLinks.Count == 0)
-                        {
-                            exampleSolution.Remove(exampleSolution.Last());
-                            curCount--;
-                        }
-                    }
                 }
             }
             else
                 title2 = exampleSolution.Last();
             curCount++;
+        }
+        if (queryLinks.Count == 0)
+        {
+            bool done = false;
+            while (!done)
+            {
+                exampleSolution.Remove(exampleSolution.Last());
+                loadlinks = StartCoroutine(getLeadsToLink(exampleSolution.Last()));
+                while (loadlinks != null) { yield return null; }
+                exampleSolution.Add(queryLinks.PickRandom());
+                loadlinks = StartCoroutine(getLeadsToLink(exampleSolution.Last()));
+                while (loadlinks != null) { yield return null; }
+                if (queryLinks.Count != 0)
+                    done = true;
+            }
+            title2 = exampleSolution.Last();
         }
         WWW www2 = new WWW(queryRedirectCheck + "&titles=" + title2);
         while (!www2.isDone) { yield return null; };
