@@ -13,6 +13,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     public KMAudio audio;
     public KMBombInfo bomb;
 
+    public KMSelectable moduleSelectable;
     public KMSelectable[] buttons;
     public Text[] texts;
 
@@ -30,10 +31,15 @@ public class OneLinksToAllScript : MonoBehaviour {
     private string title1 = "";
     private string title2 = "";
     private string temp = "";
+    private string enteredNums = "";
     private string contvar;
     private bool error = false;
     private bool activated = false;
     private bool getTerms = false;
+    private bool focused = false;
+    private bool caps = false;
+    private bool nums = false;
+    private bool alt = false;
 
     private List<string> addedArticles = new List<string>();
     private int curIndex = 0;
@@ -74,6 +80,12 @@ public class OneLinksToAllScript : MonoBehaviour {
             KMSelectable pressed = obj;
             pressed.OnInteract += delegate () { PressButton(pressed); return false; };
         }
+        if (Application.isEditor)
+        {
+            focused = true;
+        }
+        moduleSelectable.OnFocus += delegate () { focused = true; };
+        moduleSelectable.OnDefocus += delegate () { focused = false; };
         GetComponent<KMBombModule>().OnActivate += OnActivate;
     }
 
@@ -82,6 +94,594 @@ public class OneLinksToAllScript : MonoBehaviour {
         activated = true;
         load = StartCoroutine(Loading(0));
         StartCoroutine(QueryProcess());
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.CapsLock))
+        {
+            if (!caps) caps = true;
+            else caps = false;
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+        {
+            caps = true;
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
+        {
+            caps = false;
+        }
+        if (Input.GetKeyDown(KeyCode.Numlock))
+        {
+            if (!nums) nums = true;
+            else nums = false;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftAlt) || Input.GetKeyDown(KeyCode.RightAlt))
+        {
+            alt = true;
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftAlt) || Input.GetKeyUp(KeyCode.RightAlt))
+        {
+            alt = false;
+        }
+        if (moduleSolved != true && load == null && activated && focused)
+        {
+            if (Input.GetKeyUp(KeyCode.LeftAlt) || Input.GetKeyUp(KeyCode.RightAlt))
+            {
+                if (enteredNums == "0225" || enteredNums == "160")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[5].OnInteract();
+                }
+                else if (enteredNums == "0233" || enteredNums == "130")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[6].OnInteract();
+                }
+                else if (enteredNums == "0237" || enteredNums == "161")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[7].OnInteract();
+                }
+                else if (enteredNums == "0243" || enteredNums == "162")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[8].OnInteract();
+                }
+                else if (enteredNums == "0250" || enteredNums == "163")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[9].OnInteract();
+                }
+                else if (enteredNums == "0224" || enteredNums == "133")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[10].OnInteract();
+                }
+                else if (enteredNums == "0232" || enteredNums == "138")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[11].OnInteract();
+                }
+                else if (enteredNums == "0236" || enteredNums == "141")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[12].OnInteract();
+                }
+                else if (enteredNums == "0242" || enteredNums == "149")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[13].OnInteract();
+                }
+                else if (enteredNums == "0249" || enteredNums == "151")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[14].OnInteract();
+                }
+                else if (enteredNums == "0228" || enteredNums == "132")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[15].OnInteract();
+                }
+                else if (enteredNums == "0235" || enteredNums == "137")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[16].OnInteract();
+                }
+                else if (enteredNums == "0239" || enteredNums == "139")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[17].OnInteract();
+                }
+                else if (enteredNums == "0246" || enteredNums == "148")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[18].OnInteract();
+                }
+                else if (enteredNums == "0252" || enteredNums == "129")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[19].OnInteract();
+                }
+                else if (enteredNums == "0257")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[20].OnInteract();
+                }
+                else if (enteredNums == "0275")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[21].OnInteract();
+                }
+                else if (enteredNums == "0299")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[22].OnInteract();
+                }
+                else if (enteredNums == "0333")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[23].OnInteract();
+                }
+                else if (enteredNums == "0263")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[24].OnInteract();
+                }
+                else if (enteredNums == "0227")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[25].OnInteract();
+                }
+                else if (enteredNums == "0241" || enteredNums == "164")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[26].OnInteract();
+                }
+                else if (enteredNums == "0245")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[27].OnInteract();
+                }
+                else if (enteredNums == "0226" || enteredNums == "131")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[28].OnInteract();
+                }
+                else if (enteredNums == "0234" || enteredNums == "136")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[29].OnInteract();
+                }
+                else if (enteredNums == "0244" || enteredNums == "147")
+                {
+                    if (keyIndex != 2) buttons[33].OnInteract();
+                    buttons[30].OnInteract();
+                }
+                else if (enteredNums == "0151")
+                {
+                    if (keyIndex != 3) buttons[34].OnInteract();
+                    buttons[21].OnInteract();
+                }
+                enteredNums = "";
+                return;
+            }
+            if (caps && Input.GetKeyDown(KeyCode.A))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[5].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.B))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[6].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.C))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[7].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.D))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[8].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.E))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[9].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.F))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[10].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.G))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[11].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.H))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[12].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.I))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[13].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.J))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[14].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.K))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[15].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.L))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[16].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.M))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[17].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.N))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[18].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.O))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[19].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.P))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[20].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.Q))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[21].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.R))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[22].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.S))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[23].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.T))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[24].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.U))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[25].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.V))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[26].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.W))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[27].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.X))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[28].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.Y))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[29].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.Z))
+            {
+                if (keyIndex != 0) buttons[31].OnInteract();
+                buttons[30].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.A))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[5].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.B))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[6].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.C))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[7].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.D))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[8].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.E))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[9].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.F))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[10].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.G))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[11].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.H))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[12].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.I))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[13].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.J))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[14].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.K))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[15].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.L))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[16].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.M))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[17].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.N))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[18].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.O))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[19].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.P))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[20].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Q))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[21].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.R))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[22].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.S))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[23].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.T))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[24].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.U))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[25].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.V))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[26].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.W))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[27].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.X))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[28].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Y))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[29].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Z))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[30].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Z))
+            {
+                if (keyIndex != 1) buttons[32].OnInteract();
+                buttons[30].OnInteract();
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad0))
+            {
+                enteredNums += "0";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                enteredNums += "1";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                enteredNums += "2";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                enteredNums += "3";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad4))
+            {
+                enteredNums += "4";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad5))
+            {
+                enteredNums += "5";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad6))
+            {
+                enteredNums += "6";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad7))
+            {
+                enteredNums += "7";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad8))
+            {
+                enteredNums += "8";
+            }
+            else if (alt && Input.GetKeyDown(KeyCode.Keypad9))
+            {
+                enteredNums += "9";
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad0)) || (!caps && Input.GetKeyDown(KeyCode.Alpha0)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[5].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad1)) || (!caps && Input.GetKeyDown(KeyCode.Alpha1)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[6].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad2)) || (!caps && Input.GetKeyDown(KeyCode.Alpha2)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[7].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad3)) || (!caps && Input.GetKeyDown(KeyCode.Alpha3)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[8].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad4)) || (!caps && Input.GetKeyDown(KeyCode.Alpha4)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[9].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad5)) || (!caps && Input.GetKeyDown(KeyCode.Alpha5)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[10].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad6)) || (!caps && Input.GetKeyDown(KeyCode.Alpha6)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[11].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad7)) || (!caps && Input.GetKeyDown(KeyCode.Alpha7)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[12].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad8)) || (!caps && Input.GetKeyDown(KeyCode.Alpha8)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[13].OnInteract();
+            }
+            else if ((nums && Input.GetKeyDown(KeyCode.Keypad9)) || (!caps && Input.GetKeyDown(KeyCode.Alpha9)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[14].OnInteract();
+            }
+            else if (Input.GetKeyDown(KeyCode.Space) && texts[1].text.Trim() != "")
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[15].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.Alpha9))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[16].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[17].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Quote))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[18].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Period))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[19].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Comma))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[20].OnInteract();
+            }
+            else if (!caps && (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus)))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[22].OnInteract();
+            }
+            else if (caps && Input.GetKeyDown(KeyCode.Semicolon))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[23].OnInteract();
+            }
+            else if (Input.GetKeyDown(KeyCode.Backspace) && !texts[1].text.Equals(""))
+            {
+                buttons[2].OnInteract();
+            }
+            else if (((!nums && Input.GetKeyDown(KeyCode.KeypadPeriod)) || Input.GetKeyDown(KeyCode.Delete)) && !texts[1].text.Equals(""))
+            {
+                buttons[3].OnInteract();
+            }
+            else if ((!nums && Input.GetKeyDown(KeyCode.Keypad8)) || Input.GetKeyDown(KeyCode.UpArrow) && !texts[1].text.Equals(""))
+            {
+                buttons[0].OnInteract();
+            }
+            else if (((!nums && Input.GetKeyDown(KeyCode.Keypad2)) || Input.GetKeyDown(KeyCode.DownArrow)) && curIndex != 0)
+            {
+                buttons[1].OnInteract();
+            }
+            else if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) && Valid())
+            {
+                buttons[4].OnInteract();
+            }
+        }
     }
 
     void PressButton(KMSelectable pressed)
