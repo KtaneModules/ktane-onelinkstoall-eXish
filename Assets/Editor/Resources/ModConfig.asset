@@ -34,6 +34,6 @@ MonoBehaviour:
     Module and Concept by eXish
 
     Twitch Plays supported'
-  version: 1.2.5
+  version: 1.2.6
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 08640ea82b9a94c409699928daad2943, type: 3}

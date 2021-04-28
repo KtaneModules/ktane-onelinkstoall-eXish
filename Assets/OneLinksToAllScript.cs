@@ -688,7 +688,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     {
         if ((moduleSolved != true && load == null && activated) || (moduleSolved != true && pressed == buttons[4] && error))
         {
-            if (pressed == buttons[0] && !texts[1].text.Equals(""))
+            if (pressed == buttons[0] && !texts[1].text.Equals("") && submit == -1)
             {
                 pressed.AddInteractionPunch();
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
@@ -697,7 +697,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 texts[1].text = "";
                 texts[3].text = (curIndex + 1).ToString();
             }
-            else if (pressed == buttons[1] && curIndex != 0)
+            else if (pressed == buttons[1] && curIndex != 0 && submit == -1)
             {
                 pressed.AddInteractionPunch();
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
@@ -706,13 +706,13 @@ public class OneLinksToAllScript : MonoBehaviour {
                 curIndex--;
                 texts[3].text = (curIndex + 1).ToString();
             }
-            else if (pressed == buttons[2] && !texts[1].text.Equals(""))
+            else if (pressed == buttons[2] && !texts[1].text.Equals("") && submit == -1)
             {
                 pressed.AddInteractionPunch();
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
                 texts[1].text = texts[1].text.Substring(0, texts[1].text.Length-1);
             }
-            else if (pressed == buttons[3] && !texts[1].text.Equals(""))
+            else if (pressed == buttons[3] && !texts[1].text.Equals("") && submit == -1)
             {
                 pressed.AddInteractionPunch();
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
@@ -834,7 +834,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     submit = -1;
                 }
             }
-            else if (pressed == buttons[31] && keyIndex != 0)
+            else if (pressed == buttons[31] && keyIndex != 0 && submit == -1)
             {
                 pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
@@ -891,7 +891,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     buttons[i].GetComponentInChildren<TextMesh>().text = keySet1[i - 5].ToString();
                 }
             }
-            else if (pressed == buttons[32] && keyIndex != 1)
+            else if (pressed == buttons[32] && keyIndex != 1 && submit == -1)
             {
                 pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
@@ -948,7 +948,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     buttons[i].GetComponentInChildren<TextMesh>().text = keySet2[i - 5].ToString();
                 }
             }
-            else if (pressed == buttons[33] && keyIndex != 2)
+            else if (pressed == buttons[33] && keyIndex != 2 && submit == -1)
             {
                 pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
@@ -1005,7 +1005,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     buttons[i].GetComponentInChildren<TextMesh>().text = keySet3[i - 5].ToString();
                 }
             }
-            else if (pressed == buttons[34] && keyIndex != 3)
+            else if (pressed == buttons[34] && keyIndex != 3 && submit == -1)
             {
                 pressed.AddInteractionPunch(0.25f);
                 audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pressed.transform);
@@ -1062,7 +1062,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     buttons[i].GetComponentInChildren<TextMesh>().text = keySet4[i - 5].ToString();
                 }
             }
-            else if (Array.IndexOf(buttons, pressed) > 4 && pressed != buttons[31] && pressed != buttons[32] && pressed != buttons[33] && pressed != buttons[34] && pressed.GetComponentInChildren<TextMesh>().text != " ")
+            else if (Array.IndexOf(buttons, pressed) > 4 && pressed != buttons[31] && pressed != buttons[32] && pressed != buttons[33] && pressed != buttons[34] && pressed.GetComponentInChildren<TextMesh>().text != " " && submit == -1)
             {
                 if (keyIndex == 3 && pressed == buttons[15])
                 {
