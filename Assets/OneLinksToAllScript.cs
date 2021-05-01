@@ -1229,7 +1229,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         exampleSolution.Add(queryLinks.PickRandom());
         title2 = title1;
         Debug.LogFormat("<One Links To All #{0}> Starting query of finishing article...", moduleId);
-        repeats = UnityEngine.Random.Range(2, 6);
+        repeats = UnityEngine.Random.Range(20, 30);
         redo:
         while (title1.Equals(title2))
         {
@@ -1762,50 +1762,50 @@ public class OneLinksToAllScript : MonoBehaviour {
                         if (keyIndex != 3)
                         {
                             buttons[34].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                         buttons[15].OnInteract();
-                        yield return new WaitForSeconds(0.1f);
+                        yield return new WaitForSeconds(0.025f);
                     }
                     else if (keySet1.Contains(parameters[1][i]))
                     {
                         if (keyIndex != 0)
                         {
                             buttons[31].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                         buttons[Array.IndexOf(keySet1, parameters[1][i]) + 5].OnInteract();
-                        yield return new WaitForSeconds(0.1f);
+                        yield return new WaitForSeconds(0.025f);
                     }
                     else if (keySet2.Contains(parameters[1][i]))
                     {
                         if (keyIndex != 1)
                         {
                             buttons[32].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                         buttons[Array.IndexOf(keySet2, parameters[1][i]) + 5].OnInteract();
-                        yield return new WaitForSeconds(0.1f);
+                        yield return new WaitForSeconds(0.025f);
                     }
                     else if (keySet3.Contains(parameters[1][i]))
                     {
                         if (keyIndex != 2)
                         {
                             buttons[33].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                         buttons[Array.IndexOf(keySet3, parameters[1][i]) + 5].OnInteract();
-                        yield return new WaitForSeconds(0.1f);
+                        yield return new WaitForSeconds(0.025f);
                     }
                     else if (keySet4.Contains(parameters[1][i]))
                     {
                         if (keyIndex != 3)
                         {
                             buttons[34].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                         buttons[Array.IndexOf(keySet4, parameters[1][i]) + 5].OnInteract();
-                        yield return new WaitForSeconds(0.1f);
+                        yield return new WaitForSeconds(0.025f);
                     }
                 }
             }
@@ -1837,7 +1837,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                         for (int i = 0; i < temp; i++)
                         {
                             buttons[1].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                     }
                     else
@@ -1878,7 +1878,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                         for (int i = 0; i < temp; i++)
                         {
                             buttons[2].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                     }
                     else
@@ -1905,7 +1905,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (error || submit == 0)
         {
             buttons[4].OnInteract();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.05f);
         }
         else if (submit == 1 || submit == 2)
         {
@@ -1991,7 +1991,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                     while (addedArticles.Count != i)
                     {
                         buttons[1].OnInteract();
-                        yield return new WaitForSeconds(0.1f);
+                        yield return new WaitForSeconds(0.025f);
                     }
                     break;
                 }
@@ -1999,7 +1999,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             if (texts[1].text != exampleSolution[curIndex + 1])
             {
                 buttons[3].OnInteract();
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.025f);
             }
             int start = curIndex + 1;
             for (int i = start; i < exampleSolution.Count - 1; i++)
@@ -2009,11 +2009,11 @@ public class OneLinksToAllScript : MonoBehaviour {
                 if (i != (exampleSolution.Count - 2))
                 {
                     buttons[0].OnInteract();
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(0.025f);
                 }
             }
             buttons[4].OnInteract();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.025f);
             buttons[4].OnInteract();
         }
     }
