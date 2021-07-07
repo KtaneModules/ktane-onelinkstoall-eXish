@@ -1256,6 +1256,8 @@ public class OneLinksToAllScript : MonoBehaviour {
                 title2 = exampleSolution.Last();
             curCount++;
         }
+        loadlinks = StartCoroutine(getLeadsToLink(title2));
+        while (loadlinks != null) { yield return null; }
         if (queryLinks.Count == 0)
         {
             bool done = false;
