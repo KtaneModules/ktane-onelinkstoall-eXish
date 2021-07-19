@@ -1903,7 +1903,7 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        while (load != null && !activated) { yield return true; }
+        while (load != null || !activated) { yield return true; }
         if (error || submit == 0)
         {
             buttons[4].OnInteract();
