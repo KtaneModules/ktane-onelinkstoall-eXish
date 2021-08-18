@@ -47,7 +47,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     private char[] keySet1 = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
     private char[] keySet2 = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
     private char[] keySet3 = new char[] { 'á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ì', 'ò', 'ù', 'ä', 'ë', 'ï', 'ö', 'ü', 'ā', 'ē', 'ī', 'ō', 'ū', 'ã', 'ñ', 'õ', 'â', 'ê', 'ô' };
-    private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '–', '-', ':', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    private char[] keySet4 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '␣', '(', ')', '\'', '.', ',', '–', '-', ':', '&', '/', ' ', ' ', ' ', ' ', ' ' };
     private char[] keySetSolve = new char[] { 'C', 'O', 'N', 'G', 'R', 'A', 'T', 'U', 'L', 'A', 'T', 'I', 'O', 'N', 'S', 'Y', 'O', 'U', 'R', 'E', 'D', 'O', 'N', 'E', '!', ' ' };
     private int keyIndex = 0;
     private int submit = -1;
@@ -92,8 +92,11 @@ public class OneLinksToAllScript : MonoBehaviour {
     void OnActivate()
     {
         activated = true;
-        load = StartCoroutine(Loading(0));
-        StartCoroutine(QueryProcess());
+        if (!error)
+        {
+            load = StartCoroutine(Loading(0));
+            StartCoroutine(QueryProcess());
+        }
     }
 
     void Update()
@@ -661,6 +664,16 @@ public class OneLinksToAllScript : MonoBehaviour {
                 if (keyIndex != 3) buttons[34].OnInteract();
                 buttons[23].OnInteract();
             }
+            else if (caps && Input.GetKeyDown(KeyCode.Alpha7))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[24].OnInteract();
+            }
+            else if (!caps && Input.GetKeyDown(KeyCode.Slash))
+            {
+                if (keyIndex != 3) buttons[34].OnInteract();
+                buttons[25].OnInteract();
+            }
             else if (Input.GetKeyDown(KeyCode.Backspace) && !texts[1].text.Equals(""))
             {
                 buttons[2].OnInteract();
@@ -686,7 +699,7 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     void PressButton(KMSelectable pressed)
     {
-        if ((moduleSolved != true && load == null && activated) || (moduleSolved != true && pressed == buttons[4] && error))
+        if ((moduleSolved != true && load == null && activated && !error) || (moduleSolved != true && pressed == buttons[4] && error))
         {
             if (pressed == buttons[0] && !texts[1].text.Equals("") && submit == -1)
             {
@@ -1112,13 +1125,12 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     private void DealWithError(int type)
     {
+        StopAllCoroutines();
         if (type == 0)
         {
             texts[0].text = "Error: Failed to get a random article!";
             texts[2].text = "Error: Failed to get a random article!";
             Debug.LogFormat("[One Links To All #{0}] Error: Starting/finishing article query failed! Press submit to solve the module.", moduleId);
-            error = true;
-            StopAllCoroutines();
         }
         else if (type == 1)
         {
@@ -1126,17 +1138,14 @@ public class OneLinksToAllScript : MonoBehaviour {
             texts[1].text = "";
             texts[2].text = "Error: Failed to check if the path is valid!";
             Debug.LogFormat("[One Links To All #{0}] Error: Link query failed! Press submit to solve the module.", moduleId);
-            error = true;
-            StopAllCoroutines();
         }
         else if (type == 2)
         {
             texts[0].text = "Error: Failed to grab explicit terms and exceptions!";
             texts[2].text = "Error: Failed to grab explicit terms and exceptions!";
             Debug.LogFormat("[One Links To All #{0}] Error: Explicit terms and exceptions query failed! Press submit to solve the module.", moduleId);
-            error = true;
-            StopAllCoroutines();
         }
+        error = true;
     }
 
     private bool Censored(string article)
@@ -1197,6 +1206,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         else
         {
             DealWithError(2);
+            yield break;
         }
         Debug.LogFormat("<One Links To All #{0}> Query of explicit terms and exceptions successful!", moduleId);
         getTerms = false;
@@ -1222,6 +1232,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             else
             {
                 DealWithError(0);
+                yield break;
             }
         }
         exampleSolution.Add(title1);
@@ -1274,7 +1285,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             }
             title2 = exampleSolution.Last();
         }
-        WWW www2 = new WWW(queryRedirectCheck + "&titles=" + title2);
+        WWW www2 = new WWW(queryRedirectCheck + "&titles=" + title2.Replace("&", "%26"));
         while (!www2.isDone) { yield return null; };
         if (www2.error == null)
         {
@@ -1289,6 +1300,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         else
         {
             DealWithError(0);
+            yield break;
         }
         Debug.LogFormat("<One Links To All #{0}> Query of finishing article successful! Found finishing article: {1}", moduleId, title2);
         StopCoroutine(load);
@@ -1470,7 +1482,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             string urledit = queryLeadsToURL;
             if (contvar != "temp")
                 urledit += "&plcontinue=" + contvar;
-            string temp = urledit + "&titles=" + title;
+            string temp = urledit + "&titles=" + title.Replace("&", "%26");
             WWW www = new WWW(temp);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
@@ -1528,6 +1540,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             else
             {
                 DealWithError(0);
+                yield break;
             }
         }
         loadlinks = null;
@@ -1548,7 +1561,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             string urledit = queryCheckBackURL;
             if (contvar != "temp")
                 urledit += "&lhcontinue=" + contvar;
-            string temp = urledit + "&titles=" + title;
+            string temp = urledit + "&titles=" + title.Replace("&", "%26");
             WWW www = new WWW(temp);
             while (!www.isDone) { yield return null; };
             if (www.error == null)
@@ -1611,6 +1624,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             else
             {
                 DealWithError(1);
+                yield break;
             }
         }
         loadlinks = null;
@@ -1692,6 +1706,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (Regex.IsMatch(command, @"^\s*add\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
+            if (error)
+            {
+                yield return "sendtochaterror An error is being displayed, you may only press submit!";
+                yield break;
+            }
             if (texts[1].text.Equals(""))
             {
                 yield return "sendtochaterror Cannot add an empty article!";
@@ -1703,6 +1722,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (Regex.IsMatch(command, @"^\s*minus\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
+            if (error)
+            {
+                yield return "sendtochaterror An error is being displayed, you may only press submit!";
+                yield break;
+            }
             if (curIndex == 0)
             {
                 yield return "sendtochaterror Cannot remove anymore articles!";
@@ -1714,6 +1738,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (Regex.IsMatch(command, @"^\s*clear\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
+            if (error)
+            {
+                yield return "sendtochaterror An error is being displayed, you may only press submit!";
+                yield break;
+            }
             if (texts[1].text.Equals(""))
             {
                 yield return "sendtochaterror Cannot clear text on an empty screen!";
@@ -1725,6 +1754,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (Regex.IsMatch(command, @"^\s*delete\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
+            if (error)
+            {
+                yield return "sendtochaterror An error is being displayed, you may only press submit!";
+                yield break;
+            }
             if (texts[1].text.Equals(""))
             {
                 yield return "sendtochaterror Cannot delete text on an empty screen!";
@@ -1748,6 +1782,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (Regex.IsMatch(parameters[0], @"^\s*type\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
+            if (error)
+            {
+                yield return "sendtochaterror An error is being displayed, you may only press submit!";
+                yield break;
+            }
             if (parameters.Length >= 2)
             {
                 parameters[1] = command.Substring(5, command.Length - 5);
@@ -1820,6 +1859,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (Regex.IsMatch(parameters[0], @"^\s*minus\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
+            if (error)
+            {
+                yield return "sendtochaterror An error is being displayed, you may only press submit!";
+                yield break;
+            }
             if (parameters.Length > 2)
             {
                 yield return "sendtochaterror Too many parameters!";
@@ -1861,6 +1905,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         if (Regex.IsMatch(parameters[0], @"^\s*delete\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
+            if (error)
+            {
+                yield return "sendtochaterror An error is being displayed, you may only press submit!";
+                yield break;
+            }
             if (parameters.Length > 2)
             {
                 yield return "sendtochaterror Too many parameters!";
