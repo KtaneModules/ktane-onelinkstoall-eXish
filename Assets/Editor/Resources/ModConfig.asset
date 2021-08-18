@@ -29,11 +29,11 @@ MonoBehaviour:
     PDF: https://ktane.timwi.de/PDF/One%20Links%20To%20All.pdf
 
 
-    One Links To All (oneLinksToAllModule) v1.3.0
+    One Links To All (oneLinksToAllModule) v1.3.1
 
     Module and Concept by eXish
 
     Twitch Plays supported'
-  version: 1.3.0
+  version: 1.3.1
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 08640ea82b9a94c409699928daad2943, type: 3}

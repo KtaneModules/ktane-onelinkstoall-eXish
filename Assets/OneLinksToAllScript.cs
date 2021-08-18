@@ -97,6 +97,11 @@ public class OneLinksToAllScript : MonoBehaviour {
             load = StartCoroutine(Loading(0));
             StartCoroutine(QueryProcess());
         }
+        else
+        {
+            texts[0].text = "Error: Failed to grab explicit terms and exceptions!";
+            texts[2].text = "Error: Failed to grab explicit terms and exceptions!";
+        }
     }
 
     void Update()
@@ -1141,8 +1146,11 @@ public class OneLinksToAllScript : MonoBehaviour {
         }
         else if (type == 2)
         {
-            texts[0].text = "Error: Failed to grab explicit terms and exceptions!";
-            texts[2].text = "Error: Failed to grab explicit terms and exceptions!";
+            if (activated)
+            {
+                texts[0].text = "Error: Failed to grab explicit terms and exceptions!";
+                texts[2].text = "Error: Failed to grab explicit terms and exceptions!";
+            }
             Debug.LogFormat("[One Links To All #{0}] Error: Explicit terms and exceptions query failed! Press submit to solve the module.", moduleId);
         }
         error = true;
@@ -1191,16 +1199,22 @@ public class OneLinksToAllScript : MonoBehaviour {
     {
         getTerms = true;
         Debug.LogFormat("<One Links To All #{0}> Starting query of explicit terms and exceptions due to enabled filter...", moduleId);
-        UnityWebRequest www = UnityWebRequest.Get("https://spreadsheets.google.com/feeds/list/1J-AanIiu6-mcIa9sw18fdBomRluQiCnhdWMaL-OcGSc/1/public/values?alt=json");
+        UnityWebRequest www = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/1J-AanIiu6-mcIa9sw18fdBomRluQiCnhdWMaL-OcGSc/values/Sheet1?alt=json&key=AIzaSyDVdYJNALGQYBW3qwq9h-d5N4osW1y-uf0");
         yield return www.SendWebRequest();
         if (www.error == null)
         {
-            foreach (var entry in JObject.Parse(www.downloadHandler.text)["feed"]["entry"])
+            bool firstLine = true;
+            foreach (var entry in JObject.Parse(www.downloadHandler.text)["values"])
             {
-                if (!entry["gsx$bannedterms"].Value<string>("$t").ToLower().Equals(""))
-                    explicitTerms.Add(entry["gsx$bannedterms"].Value<string>("$t").ToLower());
-                if (!entry["gsx$exceptions"].Value<string>("$t").ToLower().Equals(""))
-                    exceptions.Add(entry["gsx$exceptions"].Value<string>("$t").ToLower());
+                if (!firstLine)
+                {
+                    if (!entry[0].Value<string>().ToLower().EqualsAny(""))
+                        explicitTerms.Add(entry[0].Value<string>().ToLower());
+                    if (!entry[1].Value<string>().ToLower().EqualsAny(""))
+                        exceptions.Add(entry[1].Value<string>().ToLower());
+                }
+                else
+                    firstLine = false;
             }
         }
         else
