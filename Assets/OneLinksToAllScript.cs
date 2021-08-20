@@ -7,6 +7,7 @@ using System;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 public class OneLinksToAllScript : MonoBehaviour {
 
@@ -1199,22 +1200,31 @@ public class OneLinksToAllScript : MonoBehaviour {
     {
         getTerms = true;
         Debug.LogFormat("<One Links To All #{0}> Starting query of explicit terms and exceptions due to enabled filter...", moduleId);
-        UnityWebRequest www = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/1J-AanIiu6-mcIa9sw18fdBomRluQiCnhdWMaL-OcGSc/values/Sheet1?alt=json&key=AIzaSyDVdYJNALGQYBW3qwq9h-d5N4osW1y-uf0");
+        UnityWebRequest www = UnityWebRequest.Get("https://docs.google.com/spreadsheets/d/1J-AanIiu6-mcIa9sw18fdBomRluQiCnhdWMaL-OcGSc/gviz/tq?tqx=out:json");
         yield return www.SendWebRequest();
         if (www.error == null)
         {
-            bool firstLine = true;
-            foreach (var entry in JObject.Parse(www.downloadHandler.text)["values"])
+            var match = Regex.Match(www.downloadHandler.text, @"google.visualization.Query.setResponse\((.+)\)").Groups[1].Value;
+            var sheetResponse = JsonConvert.DeserializeObject<SheetResponse>(match);
+            if (sheetResponse == null)
             {
-                if (!firstLine)
+                DealWithError(2);
+                yield break;
+            }
+            var table = sheetResponse.table;
+            var columns = table.cols.Select(column => Regex.Replace(column.label.ToLowerInvariant(), "[^a-z]", "")).ToArray();
+            foreach (var row in table.rows)
+            {
+                for (int i = 0; i < columns.Length; i++)
                 {
-                    if (!entry[0].Value<string>().ToLower().EqualsAny(""))
-                        explicitTerms.Add(entry[0].Value<string>().ToLower());
-                    if (!entry[1].Value<string>().ToLower().EqualsAny(""))
-                        exceptions.Add(entry[1].Value<string>().ToLower());
+                    if (row.c[i] != null)
+                    {
+                        if (i == 0)
+                            explicitTerms.Add(row.c[i].v.ToLower());
+                        else if (i == 1)
+                            exceptions.Add(row.c[i].v.ToLower());
+                    }
                 }
-                else
-                    firstLine = false;
             }
         }
         else
@@ -2080,6 +2090,31 @@ public class OneLinksToAllScript : MonoBehaviour {
             buttons[4].OnInteract();
             yield return new WaitForSeconds(0.025f);
             buttons[4].OnInteract();
+        }
+    }
+
+    private class SheetResponse
+    {
+        public Table table;
+
+        public class Table
+        {
+            public Column[] cols;
+            public Row[] rows;
+            public class Column
+            {
+                public string label;
+            }
+
+            public class Row
+            {
+                public Value[] c;
+
+                public class Value
+                {
+                    public string v;
+                }
+            }
         }
     }
 
