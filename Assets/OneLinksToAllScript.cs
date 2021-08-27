@@ -1722,7 +1722,7 @@ public class OneLinksToAllScript : MonoBehaviour {
     #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
-        if (load != null || !activated)
+        if ((load != null || !activated) && !error)
         {
             yield return "sendtochaterror Buttons cannot be pressed right now!";
             yield break;
@@ -1976,7 +1976,7 @@ public class OneLinksToAllScript : MonoBehaviour {
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        while (load != null || !activated) { yield return true; }
+        while ((load != null || !activated) && !error) { yield return true; }
         if (error || submit == 0)
         {
             buttons[4].OnInteract();
