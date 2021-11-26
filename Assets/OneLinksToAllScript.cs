@@ -1243,7 +1243,7 @@ public class OneLinksToAllScript : MonoBehaviour {
         while (title1.Equals(title2) || !Censored(title1))
         {
             WWW www = new WWW(queryGetRandomURL);
-            while (!www.isDone) { yield return null; };
+            while (!www.isDone) { yield return null; if (www.error != null) break; };
             if (www.error == null)
             {
                 var result = JObject.Parse(www.text);
@@ -1310,7 +1310,7 @@ public class OneLinksToAllScript : MonoBehaviour {
             title2 = exampleSolution.Last();
         }
         WWW www2 = new WWW(queryRedirectCheck + "&titles=" + title2.Replace("&", "%26"));
-        while (!www2.isDone) { yield return null; };
+        while (!www2.isDone) { yield return null; if (www2.error != null) break; };
         if (www2.error == null)
         {
             if (www2.text.ToUpper().Contains("#REDIRECT"))
@@ -1508,7 +1508,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 urledit += "&plcontinue=" + contvar;
             string temp = urledit + "&titles=" + title.Replace("&", "%26");
             WWW www = new WWW(temp);
-            while (!www.isDone) { yield return null; };
+            while (!www.isDone) { yield return null; if (www.error != null) break; };
             if (www.error == null)
             {
                 int index = www.text.IndexOf("pages") + 5;
@@ -1587,7 +1587,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 urledit += "&lhcontinue=" + contvar;
             string temp = urledit + "&titles=" + title.Replace("&", "%26");
             WWW www = new WWW(temp);
-            while (!www.isDone) { yield return null; };
+            while (!www.isDone) { yield return null; if (www.error != null) break; };
             if (www.error == null)
             {
                 int index = www.text.IndexOf("pages") + 5;
