@@ -1800,6 +1800,7 @@ public class OneLinksToAllScript : MonoBehaviour {
                 yield break;
             }
             buttons[4].OnInteract();
+            if (!error && moduleSolved) yield return "awardpoints 15";
             yield break;
         }
         string[] parameters = command.Split(' ');
