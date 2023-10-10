@@ -1246,8 +1246,15 @@ public class OneLinksToAllScript : MonoBehaviour {
             while (!www.isDone) { yield return null; if (www.error != null) break; };
             if (www.error == null)
             {
-                var result = JObject.Parse(www.text);
-                title1 = result["query"]["random"][0]["title"].ToObject<string>();
+                try
+                {
+                    var result = JObject.Parse(www.text);
+                    title1 = result["query"]["random"][0]["title"].ToObject<string>();
+                } catch (JsonReaderException)
+                {
+                    DealWithError(0);
+                    yield break;
+                }
                 loadlinks = StartCoroutine(getLeadsToLink(title1));
                 while (loadlinks != null) { yield return null; }
                 if (queryLinks.Count == 0)
